@@ -3,6 +3,7 @@ $(document).ready(function (){
         //po_modify- drawing
         if(e.keyCode == 13){
             var po_number = $(this).val();
+            let factory_category = $('#factorySelect').val();
             if(po_number == "" || po_number == null ){
                 toastr.warning('PO not found!'); //po_modify - clickbutton
             }else{
@@ -21,18 +22,19 @@ $(document).ready(function (){
                 $(this).val('');
                 $(this).focus();
 
-                GetPPSDBDataByItemCode(po_number);
+                GetPPSDBDataByItemCode(po_number, factory_category);
             }
         }
     });
 });
 
-function GetPPSDBDataByItemCode(po_number){
+function GetPPSDBDataByItemCode(po_number, factory_category){
     $.ajax({
         url: "get_pps_db_data_by_item_code",
         method: "get",
         data: {
             po_number : po_number,
+            factory_category: factory_category
         },
         // data: $('#ReceiveStratPOMaterialIssuanceForm').serialize(),
         dataType: "json",
@@ -54,8 +56,8 @@ function GetPPSDBDataByItemCode(po_number){
                 $("#frm_txt_rev_no").val(pps_db_data.drawing_rev);
 
                 $("#frm_txt_prev_shots").val(shots_details.s_count);
-                $("#frm_txt_prev_shot_accum").val(shots_accum.ttl_accum_shots);
-                $("#frm_txt_prev_maint_cycle").val(device_details.md_maintenance_cycle);
+                $("#frm_txt_prev_shot_accum").val(shots_details.ttl_accum_shots);
+                $("#frm_txt_prev_maint_cycle").val(device_details.dc_maintenance_cycle);
                 $("#frm_txt_prev_machine_no").val(shots_details.s_machine);
             }
         }
@@ -63,8 +65,8 @@ function GetPPSDBDataByItemCode(po_number){
 }
 
 function ProductIdentificatioViewingMode(){
-        //Part 1 Disable Buttons
-        $("#frm_txt_po_no").attr('disabled', true);
-        $("#frm_request_type").attr('disabled', true);
-        $("#frm_prod_identification")[0].reset();
+    //Part 1 Disable Buttons
+    $("#frm_txt_po_no").attr('disabled', true);
+    $("#frm_request_type").attr('disabled', true);
+    $("#frm_prod_identification")[0].reset();
 }
