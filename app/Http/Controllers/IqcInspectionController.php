@@ -149,7 +149,7 @@ class IqcInspectionController extends Controller
                 SELECT *
                 FROM iqc_inspections
                 WHERE deleted_at IS NULL AND judgement >= 1 AND lot_no = "'.$request->lotNum.'"
-                ORDER BY created_at DESC
+                ORDER BY date_inspected DESC
             ');
         }else{
             $tbl_iqc_inspected = DB::connection('mysql')
@@ -157,7 +157,7 @@ class IqcInspectionController extends Controller
                 SELECT *
                 FROM iqc_inspections
                 WHERE deleted_at IS NULL AND judgement >= 1
-                ORDER BY created_at DESC
+                ORDER BY date_inspected DESC
             ');
         }
 

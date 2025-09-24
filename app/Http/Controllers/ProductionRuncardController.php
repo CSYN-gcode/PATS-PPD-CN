@@ -116,15 +116,26 @@ class ProductionRuncardController extends Controller
                         $btn_class = 'btn btn-success';
                     }
 
-                    $result .= "<button class='".$btn_class." btn-sm mr-1' prod_runcard-id='".$row->id."' id='btnPrintProdRuncard'>
+                    // $cavity_details = DB::table('production_runcard_cavities')
+                    //                     ->where('prod_runcards_id', $row->id)
+                    //                     ->whereNull('deleted_at')
+                    //                     ->get();
+
+                    // if($cavity_details->isNotEmpty()){
+                    //     $is_disabled = '';
+                    // }else{
+                    //     $is_disabled = 'disabled';
+                    // }
+                        // $is_disabled
+                    $result .= "<button class='".$btn_class." btn-sm mr-1' prod_runcard-id='".$row->id."' id='btnPrintProdRuncard' >
                                     <i class='fa-solid fa-print' disabled></i>
                                 </button>";
                 }
 
                 if($row->status == 0 || $row->status == 1){
                     $result .= "<button class='btn btn-primary btn-sm mr-1 btnUpdateProdRuncardData' prod_runcard-id='$row->id'>
-                                <i class='fa-solid fa-pen-to-square'></i>
-                            </button>";
+                                    <i class='fa-solid fa-pen-to-square'></i>
+                                </button>";
                 }
 
                 if($row->status == 2 || $row->status == 3){
@@ -519,7 +530,7 @@ class ProductionRuncardController extends Controller
                                     ->where('name', $prod_runcard_data[0]->part_name)
                                     ->where('status', 1)
                                     ->first();
-                                    
+
                 $cav_data_mode = 'new';
                 // $cavity_count_data->category = 'new';
                 // $cavity_count_data->input_quantity  = 0;
@@ -973,11 +984,20 @@ class ProductionRuncardController extends Controller
                                     ->distinct()
                                     ->get();
                                     // ->pluck('operator_name');
-    
-        $cavity_details = DB::table('production_runcard_cavities')
-                                    ->where('prod_runcards_id', $runcard->id)
-                                    ->whereNull('deleted_at')
-                                    ->get();
+
+        // $cavity_details = DB::table('production_runcard_cavities')
+        //                             ->where('prod_runcards_id', $runcard->id)
+        //                             ->whereNull('deleted_at')
+        //                             ->get();
+
+        // if($cavity_details->isEmpty()){
+        //     // Handle empty cavity details case
+        //         $cavity_details = DB::table('devices')
+        //                             ->select("cavity_count")
+        //                             ->where('name', $runcard->part_name)
+        //                             ->where('status', 1)
+        //                             ->first();
+        // }
                                     // return $cavity_details;
         $all_operator_names = [];
         foreach ($operator_name_per_runcard as $row) {
@@ -1002,30 +1022,30 @@ class ProductionRuncardController extends Controller
         // container for multiple QR codes
         $data = [];
 
-        for ($i = 0; $i < count($cavity_details); $i++){
+        // for ($i = 0; $i < count($cavity_details); $i++){
 
-            $qrPayload = [
-                'po_number'         => $runcard->po_number,
-                'po_quantity'       => $runcard->po_quantity,
-                'part_name'         => $runcard->part_name,
-                'part_code'         => $runcard->part_code,
-                'production_lot'    => $runcard->production_lot,
-                'shipment_output'   => $runcard->shipment_output,
-                'runcard_status'    => $runcard->runcard_status,
-                'cavity'            => $cavity_details[$i]->cavity,
-                'cav_output_qty'    => $cavity_details[$i]->output_quantity,
-            ];
-            
+            // $qrPayload = [
+            //     'po_number'         => $runcard->po_number,
+            //     'po_quantity'       => $runcard->po_quantity,
+            //     'part_name'         => $runcard->part_name,
+            //     'part_code'         => $runcard->part_code,
+            //     'production_lot'    => $runcard->production_lot,
+            //     'shipment_output'   => $runcard->shipment_output,
+            //     'runcard_status'    => $runcard->runcard_status,
+            //     'cavity'            => $cavity_details[$i]->cavity,
+            //     'cav_output_qty'    => $cavity_details[$i]->output_quantity,
+            // ];
+
             $qrcode = QrCode::format('png')
                             ->size(300)->errorCorrection('H')
-                            ->generate(json_encode($qrPayload));
+                            ->generate(json_encode($runcard));
 
             $qr_code = "data:image/png;base64,".base64_encode($qrcode);
             $print_status!='For OQC'?'':$print_status;
 
-            $cavity         = 'Cavity '.$cavity_details[$i]->cavity;
-            $cavity_qty     = $cavity_details[$i]->output_quantity;
-            
+            // $cavity         = 'Cavity '.$cavity_details[$i]->cavity;
+            // $cavity_qty     = $cavity_details[$i]->output_quantity;
+
             $data[] = [
                 'img'  => $qr_code,
                 'text' =>  "<strong>$runcard->po_number</strong><br>
@@ -1033,11 +1053,12 @@ class ProductionRuncardController extends Controller
                 <strong>$runcard->part_name</strong><br>
                 <strong>$runcard->part_code</strong><br>
                 <strong>$runcard->production_lot</strong><br>
-                <strong>$cavity</strong><br>
-                <strong>$cavity_qty</strong><br>
+                <strong>$shipment_output</strong><br>
                 <strong>$all_operator_names</strong><br>
                 "
-                //<strong>$shipment_output</strong><br>
+                // <strong>$cavity</strong><br>
+                // <strong>$cavity_qty</strong><br>
+                // <strong>$shipment_output</strong><br>
                 // <strong>$print_status</strong><br> //clark comment 01/08/2025
             ];
 
@@ -1077,7 +1098,7 @@ class ProductionRuncardController extends Controller
                     </tr>
                 </table>
             ";
-        }
+        // }
         return response()->json(['qr_code' => $qr_code, 'label_hidden' => $data, 'label' => $label, 'production_runcard_data' => $runcard]);
     }
 }

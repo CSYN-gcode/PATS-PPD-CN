@@ -1007,7 +1007,7 @@ $(document).ready(function(){
 
         // NG = Input - Output (but prevent negatives)
         console.log('ng value', $('#formAddProductionRuncardStation').find('#txtNgQuantity').val());
-        
+
         // clear any existing timer for this row
         clearTimeout(row.data('ngTimer'));
 
@@ -1035,7 +1035,7 @@ $(document).ready(function(){
                 row.find('.cls_output').val('');
                 ngVal = 0;
             }
-            
+
             row.find('.cls_ng').val(ngVal);
         }, 1000);
 
@@ -1388,12 +1388,12 @@ $(document).ready(function(){
 
                 GetStations($('#txtSelectRuncardStation'), station_data.station_step);
                 GetSubStations($('#txtSelectRuncardSubStation'), station_data.sub_station_step);
-                
+
                 let loop_count = 0;
                 let input_val = 0;
                 let output_val = 0;
                 let ng_val = 0;
-                
+
                 if(response['cav_data_mode'] == 'edit'){
                     loop_count = cavity_count_data.length
                     category = 'edit';
@@ -1403,10 +1403,10 @@ $(document).ready(function(){
                 }
 
                 console.log('loopcount', loop_count);
-                
+
                 var tbody = $('#tableCavityCount tbody');
                     tbody.empty(); // clear old rows
-                    
+
                 for(var i = 0; i < loop_count; i++){
 
                     if(category == 'edit'){
@@ -1584,6 +1584,8 @@ $(document).ready(function(){
                 $("#img_barcode_PO_text").html(response['label']);
                 img_barcode_PO_text_hidden = response['label_hidden'];
                 $('#modalAssemblyPrintQr').modal('show');
+            }, error: function(data, xhr, status) {
+                console.error();
             }
         });
     });

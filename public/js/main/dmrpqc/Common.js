@@ -178,7 +178,7 @@ $(document).ready(function () {
             let csrf_token = $('#csrf_token').val();
             if(process_status == ''){
                 console.log('process_status null');
-                AddDmrpqc();
+                AddDmrpqc($('#frm_prod_identification'));
             }else if(process_status == 2 || process_status == 3){
                 for(let index = 1; index <= $('#row_counter').val(); index++){
                     let parts_no = $('.dieset_condition_data[index="4.'+index+'"][name="parts_no"]').val();
