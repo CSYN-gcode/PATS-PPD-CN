@@ -106,18 +106,18 @@
                         <li class="nav-item has-treeview" id="NavDMRPQC"> <!-- DMR & PQC - TS  -->
                             <a href="{{ route('dmrpqc_ts', ['factory' => 'F1']) }}" class="nav-link">
                             <i class="fa-solid fa-weight-hanging"></i>
-                            <p> DMR & PQC (F1)</p>
+                            <p> DMR & PQC</p>
                             </a>
                         </li>
                     @endif
-                    @if ( in_array(Auth::user()->position, [0,1,2,4,5,9,11,12,15,16,17]) ){{-- ISS, PROD - Machine, QC, Technician, Engr Positions --}}
-                        <li class="nav-item has-treeview" id="NavDMRPQC"> <!-- DMR & PQC - F3  -->
+                    {{-- @if ( in_array(Auth::user()->position, [0,1,2,4,5,9,11,12,15,16,17]) )
+                        <li class="nav-item has-treeview" id="NavDMRPQC">
                             <a href="{{ route('dmrpqc_ts', ['factory' => 'F3']) }}" class="nav-link">
                             <i class="fa-solid fa-weight-hanging"></i>
                             <p> DMR & PQC (F3)</p>
                             </a>
                         </li>
-                    @endif
+                    @endif --}}
                     @if ( in_array(Auth::user()->position, [0,1,3]) ){{-- ISS, PROD-Machine, ENGR Positions --}}
                         <li class="nav-item has-treeview"> <!-- DHD  -->
                             <a href="{{ route('dhd_monitoring') }}" class="nav-link">

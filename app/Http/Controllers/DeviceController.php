@@ -95,7 +95,6 @@ class DeviceController extends Controller
         date_default_timezone_set('Asia/Manila');
 
         $data = $request->all();
-        // return $data;
         if(!isset($request->id)){
             $validation = array(
                     // 'name' => ['required', 'string', 'max:255', 'unique:devices'],
@@ -103,30 +102,29 @@ class DeviceController extends Controller
                 'code' => ['required', 'string', 'max:255', 'unique:devices'],
                 'virgin' => ['required', 'string', 'max:255'],
                 'recycled' => ['required', 'string', 'max:255'],
-                'process' => ['required', 'string', 'max:255']
+                'process' => ['required', 'string', 'max:255'],
+                'cavity_count' => ['required', 'string', 'max:255']
             );
-        }
-        else{
+        }else{
             $validation = array(
                 'name' => ['required', 'string', 'max:255'],
                 'code' => ['required', 'string', 'max:255'],
                 'virgin' => ['required', 'string', 'max:255'],
                 'recycled' => ['required', 'string', 'max:255'],
-                'process' => ['required', 'string', 'max:255']
-
+                'process' => ['required', 'string', 'max:255'],
+                'cavity_count' => ['required', 'string', 'max:255']
             );
         }
+
         $validator = Validator::make($data, $validation);
 
-        if ($validator->fails()) {
+        if ($validator->fails()){
             return response()->json(['result' => '0', 'error' => $validator->messages(), 'msg' => 'Saving Failed!']);
-        }
-        else{
+        }else{
             DB::beginTransaction();
 
             try{
                 $device_array = array(
-
                     'code'            => $request->code,
                     'name'            => $request->name,
                     'process'         => $request->process,
@@ -134,8 +132,10 @@ class DeviceController extends Controller
                     'qty_per_box'     => $request->qty_box,
                     'virgin_percent'  => $request->virgin,
                     'recycle_percent' => $request->recycled,
+                    'cavity_count'    => $request->cavity_count,
 
                 );
+
                 if(isset($request->id)){ // update
                     // , 'name' => $request->name,
                     $exist = DB::connection('mysql')
@@ -150,16 +150,14 @@ class DeviceController extends Controller
 
                     if(count($exist) > 0){
                         return response()->json(['result' => 0, 'error' => $validator->messages(), 'msg' => 'Record already exist!']);
-                    }
-                    else{
+                    }else{
                         $device_array['last_updated_by'] = Auth::user()->id;
 
                         Devices::where('id', $request->id)
                         ->update($device_array);
                     }
 
-                }
-                else{ // insert
+                }else{ // insert
                     $device_array['created_by'] = Auth::user()->id;
                     $device_array['last_updated_by'] = Auth::user()->id;
                     $device_array['created_at'] = NOW();
@@ -169,8 +167,7 @@ class DeviceController extends Controller
                 DB::commit();
 
                 return response()->json(['result' => 1, 'msg' => 'Successfully Added']);
-            }
-            catch(Exemption $e){
+            }catch(Exemption $e){
                 DB::rollback();
                 return $e;
             }

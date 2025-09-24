@@ -107,6 +107,7 @@
                                               <th rowspan="2">Action</th>
                                               <th rowspan="2">Device Code</th>
                                               <th rowspan="2">Device Name</th>
+                                              <th rowspan="2">Cavity Count</th>
                                               <th rowspan="2">Qty per Reel/Bundle of Trays</th>
                                               <th rowspan="2">Qty per Box</th>
                                               <th colspan="2">Percentage</th>
@@ -218,6 +219,11 @@
                               <div class="form-group">
                                   <label>Material Name</label>
                                   <input type="text" class="form-control" name="name" id="txtAddDeviceName">
+                              </div>
+
+                              <div class="form-group">
+                                  <label>Cavity Count</label>
+                                  <input type="number" class="form-control" name="cavity_count" id="txtAddCavityCount" value="0" min="1">
                               </div>
 
                               <div class="form-group">
@@ -612,6 +618,9 @@
                 },
                 {
                     "data": "name"
+                },
+                {
+                    "data": "cavity_count"
                 },
                 {
                     "data": "qty_per_reel"

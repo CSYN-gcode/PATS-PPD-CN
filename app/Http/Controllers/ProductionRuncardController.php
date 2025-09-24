@@ -11,6 +11,7 @@ use DataTables;
 use App\Models\ProductionRuncard;
 use App\Models\ProductionRuncardStation;
 use App\Models\ProductionRuncardStationMod;
+use App\Models\ProductionRuncardCavity;
 use App\Models\QualificationDetail;
 use App\Models\OqcInspectionDetail;
 use App\Models\Devices;
@@ -26,6 +27,16 @@ class ProductionRuncardController extends Controller
         ->select("SELECT defects_infos.* FROM defects_infos
         ");
         return response()->json(['data' => $modeOfDefectResult]);
+    }
+
+    public function getCavityCount(Request $request){
+        $cavityCount = DB::table('devices')
+                        ->select("cavity_count")
+                        ->where('name', $request->device_name)
+                        ->where('status', 1)
+                        ->first();
+
+        return response()->json(['data' => $cavityCount]);
     }
 
     public function GetMachineNoFromMatrix(Request $request){
@@ -139,7 +150,7 @@ class ProductionRuncardController extends Controller
                         $result .= '<center><span class="badge badge-pill badge-info">For Station Process</span></center>';
                         break;
                     case 1: //Mass Prod
-                        $result .= '<center><span class="badge badge-pill badge-primary">For Mass Production</span></center>';
+                        $result .= '<center><span class="badge badge-pill badge-primary">Mass Production</span></center>';
                         break;
                     case 2: //Resetup
                         $result .= '<center><span class="badge badge-pill badge-warning">For Re-setup</span></center>';
@@ -181,7 +192,8 @@ class ProductionRuncardController extends Controller
                         INNER JOIN stations ON runcard_station.station = stations.id
                         INNER JOIN users AS user ON runcard_station.operator_name = user.id
                         WHERE runcard_station.prod_runcards_id = '$request->prod_runcard_id'
-                        ORDER BY runcard_station.station_step ASC
+                        AND runcard_station.deleted_at IS NULL
+                        ORDER BY runcard_station.id ASC
             ");
             // return $AssemblyRuncardStationData;
 
@@ -458,7 +470,6 @@ class ProductionRuncardController extends Controller
     }
 
     public function getProdRuncardData(Request $request){
-
         $prod_runcard_data = DB::table('production_runcards AS runcard')->select('runcard.*')
                             ->leftJoin('production_runcard_stations AS stations', 'runcard.id', '=', 'stations.prod_runcards_id')
                             // ->leftJoin('station_qualification_details AS quali_station', 'stations.id', '=', 'quali_station.prod_runcard_station_id')
@@ -497,8 +508,33 @@ class ProductionRuncardController extends Controller
             $mode_of_defect_data = [];
         }
 
+        if(isset($request->prod_runcard_station_id)){
+            $cavity_count_data =  ProductionRuncardCavity::where('prod_runcards_id', $request->prod_runcard_id)
+                                                        ->whereNull('deleted_at')
+                                                        ->get();
+
+            if($cavity_count_data->isEmpty()){
+                $cavity_count_data = DB::table('devices')
+                                    ->select("cavity_count")
+                                    ->where('name', $prod_runcard_data[0]->part_name)
+                                    ->where('status', 1)
+                                    ->first();
+                                    
+                $cav_data_mode = 'new';
+                // $cavity_count_data->category = 'new';
+                // $cavity_count_data->input_quantity  = 0;
+                // $cavity_count_data->output_quantity = 0;
+                // $cavity_count_data->ng_quantity     = 0;
+            }else{
+                $cav_data_mode = 'edit';
+            }
+        }else{
+            $cavity_count_data = [];
+            $cav_data_mode = '';
+        }
+
         // return response()->json(['production_runcard_data' => $prod_runcard_data, 'mode_of_defect_data' => $mode_of_defect_data]);
-        return response()->json(['runcard_data' => $prod_runcard_data, 'mode_of_defect_data' => $mode_of_defect_data]);
+        return response()->json(['runcard_data' => $prod_runcard_data, 'mode_of_defect_data' => $mode_of_defect_data, 'cavity_count_data' => $cavity_count_data, 'cav_data_mode' => $cav_data_mode]);
     }
 
     public function addProdRuncardStationData(Request $request){
@@ -526,7 +562,12 @@ class ProductionRuncardController extends Controller
 
             try{
                 if(!isset($request->frmstations_runcard_station_id)){
-                    if(ProductionRuncardStation::where('prod_runcards_id', $request->frmstations_runcard_id)->where('station', $request->runcard_station)->where('sub_station', $request->runcard_sub_station)->exists()){
+                    if(ProductionRuncardStation::where('prod_runcards_id', $request->frmstations_runcard_id)
+                                                ->where('station', $request->runcard_station)
+                                                ->where('sub_station', $request->runcard_sub_station)
+                                                ->whereNull('deleted_at')
+                                                ->exists())
+                    {
                         return response()->json(['result' => 2]);
                     }else{
                         $prod_runcard_station_id = ProductionRuncardStation::insertGetId([
@@ -610,6 +651,29 @@ class ProductionRuncardController extends Controller
                     }else{
                         if(ProductionRuncardStationMod::where('prod_runcard_stations_id', $prod_runcard_station_id)->exists()){
                             $is_id_deleted = ProductionRuncardStationMod::where('prod_runcard_stations_id', $prod_runcard_station_id)->delete(); //returns true/false
+                        }
+                    }
+
+                    if(isset($request->cavity)){
+                        $is_id_deleted = ProductionRuncardCavity::where('prod_runcards_id', $request->frmstations_runcard_id)->delete();
+
+                        foreach ($request->cavity as $key => $value) {
+                            ProductionRuncardCavity::insert([
+                                'prod_runcards_id'             => $request->frmstations_runcard_id,
+                                'cavity'                       => $request->cavity[$key],
+                                'input_quantity'               => $request->input_cav[$key],
+                                'output_quantity'              => $request->output_cav[$key],
+                                'ng_quantity'                  => $request->ng_cav[$key],
+                                'created_by'                   => Auth::user()->id,
+                                'last_updated_by'              => Auth::user()->id,
+                                'created_at'                   => date('Y-m-d H:i:s'),
+                                'updated_at'                   => date('Y-m-d H:i:s'),
+                            ]);
+                        }
+
+                    }else{
+                        if(ProductionRuncardCavity::where('prod_runcards_id', $request->frmstations_runcard_id)->exists()){
+                            $is_id_deleted = ProductionRuncardCavity::where('prod_runcards_id', $request->frmstations_runcard_id)->delete(); //returns true/false
                         }
                     }
 
@@ -700,7 +764,6 @@ class ProductionRuncardController extends Controller
         $tominus = 0;
 
         if($is_ud_ptnr_no_exist == 'False' && $is_annealing_station_exist == 'False'){ // **W/O ANNEALING & UD
-            // return 'true';
             if($previous_station_step == 1){
                 $toadd = 1; //skip 1 substation
             }else if($previous_station_step == 3 && $previous_sub_station_step == 5){
@@ -708,14 +771,12 @@ class ProductionRuncardController extends Controller
             }
         }else if($is_ud_ptnr_no_exist == 'True' && $is_annealing_station_exist == 'True'){// **WITH ANNEALING & UD
             $toadd = 0;
-            // return 'true';
             if($previous_station_step == 3 && $previous_sub_station_step == 3){// **FINISHING SEGREGATION
                 $tominus = 1;
             }else if($previous_station_step == 4 && $previous_sub_station_step == 5){
                 $tominus = 1; //skip 1 station
             }
         }else if($is_ud_ptnr_no_exist == 'True' && $is_annealing_station_exist == 'False'){ // **W/O ANNEALING BUT W/ UD
-            // return 'true';
             if($previous_station_step == 1){
                 $toadd = 0;
             }else if($previous_station_step == 2 && $previous_sub_station_step == 3){
@@ -903,7 +964,6 @@ class ProductionRuncardController extends Controller
                                     ->whereNull('production_runcards.deleted_at')
                                     ->first();
         // return $runcard;
-
         $op_names_array = [];
         $operator_name_per_runcard = DB::table('production_runcard_stations AS stations')
                                     ->select(DB::raw("CONCAT(LEFT(users.firstname, 1), '.', users.lastname) AS operator_name"))
@@ -913,20 +973,17 @@ class ProductionRuncardController extends Controller
                                     ->distinct()
                                     ->get();
                                     // ->pluck('operator_name');
-
-        // return $operator_name_per_runcard;
+    
+        $cavity_details = DB::table('production_runcard_cavities')
+                                    ->where('prod_runcards_id', $runcard->id)
+                                    ->whereNull('deleted_at')
+                                    ->get();
+                                    // return $cavity_details;
         $all_operator_names = [];
         foreach ($operator_name_per_runcard as $row) {
-            $all_operator_names[] = $row->operator_name;  // Add a space or custom separator
+            $all_operator_names[] = $row->operator_name;
         }
         $all_operator_names = implode(', ', $all_operator_names);
-
-        // foreach ($operator_name_per_runcard as $items) {
-        //     array_push($op_names_array, $items);
-        // }
-
-        // $unique_op_names = array_unique($op_names_array);
-        // $all_operator_names = implode(', ', $unique_op_names);
 
         if($runcard->runcard_status == 3){
             $shipment_output = $runcard->shipment_output;
@@ -935,72 +992,92 @@ class ProductionRuncardController extends Controller
             $shipment_output = $runcard->shipment_output;
             $print_status = 'For Traceability Only';
         }else if($runcard->runcard_status == 0){
-            // $shipment_output = $runcard->shipment_output;
             $shipment_output = 'N/A';
             $all_operator_names = $runcard->operator_name;
             $print_status = 'For IPQC';
         }else{
             $shipment_output = 'N/A';
         }
-// $print_status
-        $qrcode = QrCode::format('png')
-        ->size(300)->errorCorrection('H')
-        ->generate(json_encode($runcard));
 
-        $qr_code = "data:image/png;base64," . base64_encode($qrcode);
+        // container for multiple QR codes
+        $data = [];
 
-        $print_status!='For OQC'?'':$print_status;
-        // <strong>$print_status</strong><br>
-        $data[] = array(
-            'img'  => $qr_code,
-            'text' =>  "<strong>$runcard->po_number</strong><br>
-            <strong>$runcard->po_quantity</strong><br>
-            <strong>$runcard->part_name</strong><br>
-            <strong>$runcard->part_code</strong><br>
-            <strong>$runcard->production_lot</strong><br>
-            <strong>$shipment_output</strong><br>
-            <strong>$all_operator_names</strong><br>
-            "
-            // <strong>$print_status</strong><br> //clark comment 01/08/2025
-        );
+        for ($i = 0; $i < count($cavity_details); $i++){
 
-        $label = "
-            <table class='table table-sm table-borderless' style='width: 100%;'>
-                <tr>
-                    <td>PO No:</td>
-                    <td>$runcard->po_number</td>
-                </tr>
-                <tr>
-                    <td>PO Quantity:</td>
-                    <td>$runcard->po_quantity</td>
-                </tr>
-                <tr>
-                    <td>Device Name:</td>
-                    <td>$runcard->part_name</td>
-                </tr>
-                <tr>
-                    <td>Part Code:</td>
-                    <td>$runcard->part_code</td>
-                </tr>
-                <tr>
-                    <td>Production Lot #:</td>
-                    <td>$runcard->production_lot</td>
-                </tr>
-                <tr>
-                    <td>Shipment Output:</td>
-                    <td>$shipment_output</td>
-                </tr>
-                <tr>
-                    <td>Operator Name:</td>
-                    <td>$all_operator_names</td>
-                </tr>
-                <tr>
-                    <td>QR Purpose:</td>
-                    <td>$print_status</td>
-                </tr>
-            </table>
-        ";
+            $qrPayload = [
+                'po_number'         => $runcard->po_number,
+                'po_quantity'       => $runcard->po_quantity,
+                'part_name'         => $runcard->part_name,
+                'part_code'         => $runcard->part_code,
+                'production_lot'    => $runcard->production_lot,
+                'shipment_output'   => $runcard->shipment_output,
+                'runcard_status'    => $runcard->runcard_status,
+                'cavity'            => $cavity_details[$i]->cavity,
+                'cav_output_qty'    => $cavity_details[$i]->output_quantity,
+            ];
+            
+            $qrcode = QrCode::format('png')
+                            ->size(300)->errorCorrection('H')
+                            ->generate(json_encode($qrPayload));
 
+            $qr_code = "data:image/png;base64,".base64_encode($qrcode);
+            $print_status!='For OQC'?'':$print_status;
+
+            $cavity         = 'Cavity '.$cavity_details[$i]->cavity;
+            $cavity_qty     = $cavity_details[$i]->output_quantity;
+            
+            $data[] = [
+                'img'  => $qr_code,
+                'text' =>  "<strong>$runcard->po_number</strong><br>
+                <strong>$runcard->po_quantity</strong><br>
+                <strong>$runcard->part_name</strong><br>
+                <strong>$runcard->part_code</strong><br>
+                <strong>$runcard->production_lot</strong><br>
+                <strong>$cavity</strong><br>
+                <strong>$cavity_qty</strong><br>
+                <strong>$all_operator_names</strong><br>
+                "
+                //<strong>$shipment_output</strong><br>
+                // <strong>$print_status</strong><br> //clark comment 01/08/2025
+            ];
+
+            $label = "
+                <table class='table table-sm table-borderless' style='width: 100%;'>
+                    <tr>
+                        <td>PO No:</td>
+                        <td>$runcard->po_number</td>
+                    </tr>
+                    <tr>
+                        <td>PO Quantity:</td>
+                        <td>$runcard->po_quantity</td>
+                    </tr>
+                    <tr>
+                        <td>Device Name:</td>
+                        <td>$runcard->part_name</td>
+                    </tr>
+                    <tr>
+                        <td>Part Code:</td>
+                        <td>$runcard->part_code</td>
+                    </tr>
+                    <tr>
+                        <td>Production Lot #:</td>
+                        <td>$runcard->production_lot</td>
+                    </tr>
+                    <tr>
+                        <td>Shipment Output:</td>
+                        <td>$shipment_output</td>
+                    </tr>
+                    <tr>
+                        <td>Operator Name:</td>
+                        <td>$all_operator_names</td>
+                    </tr>
+                    <tr>
+                        <td>QR Purpose:</td>
+                        <td>$print_status</td>
+                    </tr>
+                </table>
+            ";
+        }
         return response()->json(['qr_code' => $qr_code, 'label_hidden' => $data, 'label' => $label, 'production_runcard_data' => $runcard]);
     }
 }

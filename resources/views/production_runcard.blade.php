@@ -22,7 +22,7 @@
             /* .select2-container--bootstrap-5 .select2-selection--single {
                 height: calc(1.9rem + 2px) !important;
             } */
-             
+
             .select2-container--bootstrap-5 .select2-selection{
             /* .input-group .select2-container--bootstrap-5 .select2-selection{ */
             /* .select2-selection .select2-selection--single { */
@@ -34,7 +34,7 @@
                 height: calc(1.9rem + 2px) !important;
                 font-size: 0.875rem !important;
             }
-            
+
         </style>
 
         <!-- Content Wrapper. Contains page content -->
@@ -550,7 +550,7 @@
                                 </div>
                             </div>
 
-                            {{-- Plastic Injection Additional START --}}
+                            {{-- Annealing START --}}
                             <div id="AnnealingAddDiv" class="d-none">
                                 <div class="row">
                                     <div class="col">
@@ -612,7 +612,7 @@
                                     </div>
                                 </div>
                             </div>
-                            {{-- Plastic Injection Additional END --}}
+                            {{-- Annealing END --}}
 
                             <div class="row">
                                 <div class="col">
@@ -669,6 +669,29 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            {{-- Cavity Count START --}}
+                            <div id="CavityCountDiv" class="d-none">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm" id="tableCavityCount">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 10%;">Cavity</th>
+                                                        <th style="width: 20%;">Input</th>
+                                                        <th style="width: 20%;">Output</th>
+                                                        <th style="width: 20%;">NG</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- Cavity Count END --}}
 
                             {{-- MODE OF DEFECTS START --}}
                             <div class="row">

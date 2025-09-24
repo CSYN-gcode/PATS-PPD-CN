@@ -152,6 +152,7 @@ Route::controller(AssemblyFviController::class)->group(function () {
 
 /* DMRPQC CONTROLLER*/
 Route::controller(DmrpqcTsController::class)->group(function () {
+    Route::get('/get_dmrpqc_by_name', 'getDmrpqcByName')->name('get_dmrpqc_by_name');
     Route::get('/view_dmrpqc', 'ViewDmrpqc')->name('view_dmrpqc');
     Route::post('/add_request', 'AddRequest')->name('add_request');
     Route::post('/delete_request', 'DeleteRequest')->name('delete_request');
@@ -247,6 +248,7 @@ Route::controller(ProductionRuncardController::class)->group(function(){
     Route::post('/update_prod_runcard_status', 'UpdateProdRuncardStatus')->name('update_prod_runcard_status');
     Route::post('/submit_prod_runcard', 'SubmitProdRuncard')->name('submit_prod_runcard');
     Route::get('/get_mode_of_defect_for_prod', 'GetModeOfDefect')->name('get_mode_of_defect_for_prod');
+    Route::get('/get_cavity_count', 'getCavityCount')->name('get_cavity_count');
 });
 
 //Qualification Controller

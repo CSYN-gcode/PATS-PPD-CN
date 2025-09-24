@@ -28,23 +28,16 @@ use App\Models\User;
 
 class DmrpqcTsController extends Controller
 {
+    public function getDmrpqcByName(Request $request){
+        $dmrpqc_device_info = DB::connection('mysql')
+        ->select('SELECT * FROM dmrpqc_product_identifications WHERE device_name = "'.$request->device_name.'" 
+                    AND logdel = 0 ORDER BY id DESC LIMIT 1');
+        return response()->json(['dmrpqc_device_info' => $dmrpqc_device_info]);
+    }
+
     public function GetUsersByPosition(Request $request){
-        // return $request->position;
-        // $users = User::where('position', $request->position)->where('status', 1)->get();
-        //
-        // return $users;
-
         $users = DB::connection('mysql')->select('SELECT * FROM users WHERE position IN ('.$request->position.') AND status = 1');
-
-        // return $users;
-
         return response()->json(['users' => $users]);
-        // $pps_db_details = DB::connection('mysql_rapid_pps')
-        // ->select(' SELECT po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS po_qty, dieset.DieNo AS die_no, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev
-        //     FROM tbl_POReceived AS po_receive
-        //     LEFT JOIN tbl_dieset AS dieset ON po_receive.ItemCode = dieset.R3Code
-        //     WHERE OrderNo = "'.$request->po_number.'"
-        //     ');
     }
 
     public function ViewDmrpqc(Request $request){

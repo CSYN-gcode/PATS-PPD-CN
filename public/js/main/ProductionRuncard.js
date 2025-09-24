@@ -58,7 +58,6 @@ $(document).ready(function(){
             },
             dataType: "json",
             beforeSend: function(){
-                // prodData = {};
             },
             success: function (response) {
                 let device_details = response['device_details'];
@@ -188,34 +187,40 @@ $(document).ready(function(){
 
     $('#btnAddProductionRuncard').on('click', function(e){
         if($('#txtSelectDeviceName').val() != "" && $('#txtSearchMaterialName').val() != ""){
-            $('#modalProdRuncard').modal('show');
-            $('#txtPartName').val($('#txtSelectDeviceName').val());
-            $('#txtPartCode').val($('#txtSearchDeviceCode').val());
-            $('#txtRequiredOutput').val($('#txtSearchReqOutput').val());
+            $.ajax({
+                type: "get",
+                url: "get_dmrpqc_by_name",
+                data: {
+                    device_name: $('#txtSelectDeviceName').val(),
+                },
+                dataType: "json",
+                success: function (response) {
+                    let data = response['dmrpqc_device_info'];
 
-            if($('#txtProdRuncardId').val() == ''){
-                $('#btnAddRuncardStation').prop('disabled', true);
-            }else{
-                $('#btnAddRuncardStation').prop('disabled', false);
-            }
+                    if(data.length > 0){
+                        $('#modalProdRuncard').modal('show');
+                        $('#txtPartName').val($('#txtSelectDeviceName').val());
+                        $('#txtPartCode').val($('#txtSearchDeviceCode').val());
+                        $('#txtRequiredOutput').val($('#txtSearchReqOutput').val());
 
-            $('#btnSaveRuncardDetails').prop('hidden', false);
+                        if($('#txtProdRuncardId').val() == ''){
+                            $('#btnAddRuncardStation').prop('disabled', true);
+                        }else{
+                            $('#btnAddRuncardStation').prop('disabled', false);
+                        }
 
-            $('#btnRuncardDetails').prop('hidden', false);
-            $('#txtPONumber').prop('disabled', false);
-            // $('#btnScanSZeroSevenProdLot').prop('disabled', false);
-            // $('#btnScanSZeroTwoProdLot').prop('disabled', false);
-            // $('#btnAddRuncardStation').prop('hidden', false);
-            $('#btnSubmitAssemblyRuncardData').prop('hidden', true);
-            GetPOFromPPSDB($('#txtPONumber'), $('#txtSelectDeviceName').val());
-            GetMachineNo($('.SelMachineNo'), $('#txtSelectDeviceName').val());
-            //
-
-            //     GetDocumentNoFromACDCS($('#txtDeviceName').val(), 'R Drawing', $("#txtSelectDocNoRDrawing"));
-            //     GetDocumentNoFromACDCS($('#txtDeviceName').val(), 'A Drawing', $("#txtSelectDocNoADrawing"));
-            //     GetDocumentNoFromACDCS($('#txtDeviceName').val(), 'G Drawing', $("#txtSelectDocNoGDrawing"));
-        }
-        else{
+                        $('#btnSaveRuncardDetails').prop('hidden', false);
+                        $('#btnRuncardDetails').prop('hidden', false);
+                        $('#txtPONumber').prop('disabled', false);
+                        $('#btnSubmitAssemblyRuncardData').prop('hidden', true);
+                        GetPOFromPPSDB($('#txtPONumber'), $('#txtSelectDeviceName').val());
+                        GetMachineNo($('.SelMachineNo'), $('#txtSelectDeviceName').val());
+                    }else{
+                        toastr.error('Device has no DMR & PQC data, Please process to DMR & PQC first');
+                    }
+                }
+            });
+        }else{
             toastr.error('Please Select Device Name')
         }
     });
@@ -885,11 +890,9 @@ $(document).ready(function(){
                     $('#txtInputQuantity').prop('readonly', true);
                 }else{ //clark 01/07/2025
                     $('#txtInputQuantity').prop('readonly', false);
-                    // console.log(typeof($('#txtPOBalance').val()));
-                    // $('#txtPOBalance').val(response['po_balance']);
                     let po_balance = parseInt($('#txtPOBalance').val());
                     let packing_qty = parseInt($('#txtRequiredOutput').val());
-                    // console.log(po_balance < packing_qty);
+
                     if(po_balance < packing_qty){
                         toastr.warning('PO Balance is less than Packing Qty, Remaining PO Balance will be used');
                         $('#txtInputQuantity').val($('#txtPOBalance').val());
@@ -943,6 +946,45 @@ $(document).ready(function(){
         CheckExistingStations(runcard_id);
         CheckExistingSubStations(runcard_id);
 
+        // console.log('station', $('#txtSelectRuncardStation option:selected').text());
+        // console.log('sub station', $('#txtSelectRuncardSubStation option:selected').text());
+
+        if($('#txtSelectRuncardStation option:selected').text() == 'Visual Inspection' && $('#txtSelectRuncardSubStation option:selected').text() == 'Visual Inspection'){
+            // Fetch cavity count from server
+            $.ajax({
+                url: "get_cavity_count", // your API endpoint
+                type: "get",
+                data: {
+                    "device_name" : $('#formProductionRuncard').find('#txtPartName').val(),
+                },
+                dataType: 'json',
+                success: function(response){
+                    let cavityCount = response.data.cavity_count; // ex: 2, 3, etc.
+                    let inputCavityVal = parseInt($('#txtInputQuantity').val()) / cavityCount;
+                    let tbody = $('#tableCavityCount tbody');
+                    tbody.empty(); // clear old rows
+
+                    for(let i = 1; i <= cavityCount; i++){
+                        let cavityLabel = String.fromCharCode(64 + i);
+                        let row = `
+                            <tr>
+                                <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}" readonly></td>
+                                <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" value="${inputCavityVal}" readonly></td>
+                                <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0"></td>
+                                <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" readonly></td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    }
+
+                    // show the div if hidden
+                    $('#CavityCountDiv').removeClass('d-none');
+                }
+            });
+        }else{
+            $('#CavityCountDiv').addClass('d-none');
+        }
+
         // $('#buttonAddRuncardModeOfDefect').prop('hidden', false);
          $('#formAddProductionRuncardStation #txtFrmStationsRuncardId').val(runcard_id);
          $("#buttonAddRuncardModeOfDefect").prop('disabled', true);
@@ -953,11 +995,60 @@ $(document).ready(function(){
         $("#txtRemarks").prop('disabled', false);
     });
 
+    // let ngTimeout; // global timeout holder
+
+    // Attach event listener for dynamic inputs
+    $(document).on('input', '.cls_input, .cls_output', function () {
+        let row = $(this).closest('tr'); // find the row where the change happened
+
+        let inputVal = parseInt(row.find('.cls_input').val()) || 0;
+        let outputVal = parseInt(row.find('.cls_output').val()) || 0;
+        let stationOutputQty = $('#formAddProductionRuncardStation').find('#txtNgQuantity').val();
+
+        // NG = Input - Output (but prevent negatives)
+        console.log('ng value', $('#formAddProductionRuncardStation').find('#txtNgQuantity').val());
+        
+        // clear any existing timer for this row
+        clearTimeout(row.data('ngTimer'));
+
+        // set a new timer (3 seconds)
+        let timer = setTimeout(function () {
+            let ngVal = inputVal - outputVal;
+            console.log('initial ngVal', ngVal);
+
+            let swal_title;
+
+            if(ngVal < 0){
+                swal_title = 'NG Quantity cannot be less than Zero!';
+            }else if(ngVal > stationOutputQty){
+                swal_title = 'NG Quantity cannot be less than Zero!';
+            }
+
+            if(ngVal < 0 || ngVal > stationOutputQty){
+                Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    title: swal_title,
+                    showConfirmButton: false,
+                    timer: 500
+                });
+                row.find('.cls_output').val('');
+                ngVal = 0;
+            }
+            
+            row.find('.cls_ng').val(ngVal);
+        }, 1000);
+
+        // store the timer reference on the row
+        row.data('ngTimer', timer);
+    });
+
     $('#txtOutputQuantity, #txtInputQuantity').each(function(e){
         $(this).keyup(delay(function(e){
             let input_val = parseFloat($('#txtInputQuantity').val());
             let output_val = parseFloat($('#txtOutputQuantity').val());
             let ng_value;
+
             if(output_val === "" || isNaN(output_val) || input_val === "" || isNaN(input_val)){
                 ng_value = '';
             }else if(output_val != "" || input_val != ""){
@@ -1008,10 +1099,6 @@ $(document).ready(function(){
                 $("#buttonAddRuncardModeOfDefect").prop('disabled', false);
                 $("#btnSaveNewRuncardStation").prop('disabled', true);
             }
-
-            // console.log(input_val);
-            // console.log(output_val);
-            // CalculateTotalOutputandYield(output_val,input_val);
         }, 500));
     });
 
@@ -1241,6 +1328,7 @@ $(document).ready(function(){
             success: function(response){
                 const station_data = response['runcard_data'][0];
                 const mode_of_defect_data = response['mode_of_defect_data'];
+                const cavity_count_data = response['cavity_count_data'];
 
                 $('#formAddProductionRuncardStation #txtStep').val(station_data.station_step);
                 $('#formAddProductionRuncardStation #txtSubStationStep').val(station_data.sub_station_step);
@@ -1298,16 +1386,51 @@ $(document).ready(function(){
                     $("#txtDefectCheckpoint option[value="+value+"]").prop('selected', true);
                 });
 
-                // getModeOfDefect($("#tableRuncardStationMOD tr:last").find('.selectMOD'), mode_of_defect_data[index].mod_id);
-                // $('#formAddQualiDetails #txtRuncardStationId').val(station_data.id);
-
                 GetStations($('#txtSelectRuncardStation'), station_data.station_step);
                 GetSubStations($('#txtSelectRuncardSubStation'), station_data.sub_station_step);
+                
+                let loop_count = 0;
+                let input_val = 0;
+                let output_val = 0;
+                let ng_val = 0;
+                
+                if(response['cav_data_mode'] == 'edit'){
+                    loop_count = cavity_count_data.length
+                    category = 'edit';
+                }else if(response['cav_data_mode'] == 'new'){
+                    loop_count = cavity_count_data.cavity_count
+                    category = 'new';
+                }
 
-                // if(station_data.station_step == '2'){
-                //     $('.QualiDetailsDiv').removeClass('d-none', true);
-                // }
+                console.log('loopcount', loop_count);
+                
+                var tbody = $('#tableCavityCount tbody');
+                    tbody.empty(); // clear old rows
+                    
+                for(var i = 0; i < loop_count; i++){
 
+                    if(category == 'edit'){
+                        input_val = cavity_count_data[i].input_quantity;
+                        output_val = cavity_count_data[i].output_quantity;
+                        ng_val = cavity_count_data[i].ng_quantity;
+                    }
+                    // else if(category == 'new'){
+                    //     input_val = cavity_count_data.input_quantity;
+                    //     output_val = cavity_count_data.output_quantity;
+                    //     ng_val = cavity_count_data.ng_quantity;
+                    // }
+
+                    let cavityLabel = String.fromCharCode(64 + (i + 1));
+                    let row = `
+                        <tr>
+                            <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}" readonly></td>
+                            <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" min="0" value="${input_val}" readonly></td>
+                            <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0" value="${output_val}" ></td>
+                            <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" value="${ng_val}" readonly></td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                }
 
                 for(let index = 0; index < mode_of_defect_data.length; index++){
                     let rowModeOfDefect = `
@@ -1327,6 +1450,7 @@ $(document).ready(function(){
                     $("#tableRuncardStationMOD tbody").append(rowModeOfDefect);
                     getModeOfDefect($("#tableRuncardStationMOD tr:last").find('.selectMOD'), mode_of_defect_data[index].mode_of_defects);
                 }
+
                 getValidateTotalNgQty (station_data.station_ng_qty, 0);
                 // $("#labelTotalNumberOfNG").text(parseInt(0));
 
@@ -1377,9 +1501,7 @@ $(document).ready(function(){
     // }
 
     function GetStations(cboElement, step = null, is_ud_ptnr = null){
-        // console.log('prod_get_station');
         let result = '<option value="" disabled selected>-- Select Station --</option>';
-        // let deviceName = $('#txtSelectDeviceName').val();
         let deviceName = $('#txtPartName').val();
         $.ajax({
             type: "get",
@@ -1403,7 +1525,7 @@ $(document).ready(function(){
                 }
                 cboElement.html(result);
 
-                console.log('test', $("#txtSelectRuncardStation option[step='"+step+"']"));
+                // console.log('test', $("#txtSelectRuncardStation option[step='"+step+"']"));
                 $("#txtSelectRuncardStation option[step='"+step+"']").attr('selected', true);
                 $("#txtRuncardStation").val($("#txtSelectRuncardStation option[step='"+step+"']").val());
 
@@ -1413,6 +1535,15 @@ $(document).ready(function(){
                     }else{
                         $('#AnnealingAddDiv').addClass('d-none');
                     }
+                }
+
+                console.log('station', $('#txtSelectRuncardStation option:selected').text());
+                console.log('sub station', $('#txtSelectRuncardSubStation option:selected').text());
+
+                if($('#txtSelectRuncardStation option:selected').text() == 'Visual Inspection' && $('#txtSelectRuncardSubStation option:selected').text() == 'Visual Inspection'){
+                    $('#CavityCountDiv').removeClass('d-none');
+                }else{
+                    $('#CavityCountDiv').addClass('d-none');
                 }
             },
             error: function(data, xhr, status) {
@@ -1448,7 +1579,7 @@ $(document).ready(function(){
                 runcard_id: prod_runcard_id
             },
             dataType: "json",
-            success: function (response) {
+            success: function (response){
                 $("#img_barcode_PO").attr('src', response['qr_code']);
                 $("#img_barcode_PO_text").html(response['label']);
                 img_barcode_PO_text_hidden = response['label_hidden'];
@@ -1473,20 +1604,23 @@ $(document).ready(function(){
         content += '</style>';
         content += '</head>';
         content += '<body>';
-        // for (let i = 0; i < img_barcode_PO_text_hidden.length; i++) {
+        // Loop through all QR codes
+        for (let i = 0; i < img_barcode_PO_text_hidden.length; i++) {
             content += '<table style="margin-left: -5px; margin-top: 18px;">';
                 content += '<tr style="width: 290px;">';
                     content += '<td style="vertical-align: bottom;">';
-                        content += '<img src="' + img_barcode_PO_text_hidden[0]['img'] + '" style="min-width: 90px; max-width: 90px;">';
+                        content += '<img src="' + img_barcode_PO_text_hidden[i]['img'] + '" style="min-width: 90px; max-width: 90px;">';
                     content += '</td>';
-                    content += '<td style="font-size: 10px; font-family: Calibri;">' + img_barcode_PO_text_hidden[0]['text'] + '</td>';
+                    content += '<td style="font-size: 10px; font-family: Calibri;">' + img_barcode_PO_text_hidden[i]['text'] + '</td>';
                 content += '</tr>';
             content += '</table>';
             content += '<br>';
-            // if( i < img_barcode_PO_text_hidden.length-1 ){
-            //     content += '<div class="pagebreak"> </div>';
-            // }
-        // }
+
+            // add page break between stickers, except after the last one
+            if(i < img_barcode_PO_text_hidden.length-1 ){
+                content += '<div class="pagebreak"> </div>';
+            }
+        }
         content += '</body>';
         content += '</html>';
         popup.document.write(content);
