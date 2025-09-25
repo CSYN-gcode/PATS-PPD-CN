@@ -960,7 +960,7 @@ $(document).ready(function(){
                 dataType: 'json',
                 success: function(response){
                     let cavityCount = response.data.cavity_count; // ex: 2, 3, etc.
-                    let inputCavityVal = parseInt($('#txtInputQuantity').val()) / cavityCount;
+                    let inputCavityVal = parseInt($('#formAddProductionRuncardStation').find('#txtInputQuantity').val()) / cavityCount;
                     let tbody = $('#tableCavityCount tbody');
                     tbody.empty(); // clear old rows
 
@@ -1595,7 +1595,7 @@ $(document).ready(function(){
         $('#modalNotification').modal('show');
     });
 
-    $('#btnAssemblyPrintQrCode').on('click', function(){
+    $('#btnPrintQrCode').on('click', function(){
         popup = window.open();
         let content = '';
         content += '<html>';

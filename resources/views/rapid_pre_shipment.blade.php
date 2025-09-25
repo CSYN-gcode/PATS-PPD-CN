@@ -814,7 +814,7 @@
                         </div> --}}
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" id="btnAssemblyPrintQrCode" class="btn btn-primary btn-sm"><i class="fa fa-print fa-xs" disabled></i> Print</button>
+                        <button type="submit" id="btnPrintQrCode" class="btn btn-primary btn-sm"><i class="fa fa-print fa-xs" disabled></i> Print</button>
                         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div><!-- /.modal-content -->

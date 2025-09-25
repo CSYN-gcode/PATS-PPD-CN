@@ -676,16 +676,34 @@
                     if( e.keyCode == 13 ){
                         const scanQrCode = $('#txtScanQrCode').val()
                         console.log('scanQrCode: ', scanQrCode);
-                        try {
+                        try{
                             let po = JSON.parse(scanQrCode)
-                                getPoNo =  po.po_number
-                                $('#txtPoNumber').val(po.po_number)
-                                $('#txtMaterialName').val(po.part_name)
-                                $('#txtPoQuantity').val(po.po_quantity)
-                                $("#txtOQCProdLotNo").val(po.production_lot)
-                                $('#mdlScanQrCode').modal('hide')
-                        }
-                        catch (error) {
+                            console.log('po', po);
+                            console.log('part_name', po.part_name);
+                            device_name = po.part_name;
+                            console.log('device_name', device_name);
+
+                            fetchData(device_name, function(result, error) {
+                                if(error){
+                                    alert("Something went wrong: " + error);
+                                    return;
+                                }
+                                // console.log('testval', result.dmrpqc_device_info.length);
+                                
+                                // Example validation
+                                if(result.dmrpqc_device_info){
+                                        getPoNo =  po.po_number
+                                        $('#txtPoNumber').val(po.po_number)
+                                        $('#txtMaterialName').val(po.part_name)
+                                        $('#txtPoQuantity').val(po.po_quantity)
+                                        $("#txtOQCProdLotNo").val(po.production_lot)
+                                        $('#mdlScanQrCode').modal('hide')
+                                }else{
+                                    alert("Device has no completed DMR & PQC data, Please complete to DMR & PQC first");
+                                }
+                            });
+                            
+                        }catch (error) {
                             alert('The Scan QR Code was not found!')
                             $('.invalidScan').val('')
                             getPoNo = ''

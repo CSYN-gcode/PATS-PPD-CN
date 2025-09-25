@@ -29,10 +29,21 @@ use App\Models\User;
 class DmrpqcTsController extends Controller
 {
     public function getDmrpqcByName(Request $request){
-        $dmrpqc_device_info = DB::connection('mysql')
-        ->select('SELECT * FROM dmrpqc_product_identifications WHERE device_name = "'.$request->device_name.'" 
-                    AND logdel = 0 ORDER BY id DESC LIMIT 1');
-        return response()->json(['dmrpqc_device_info' => $dmrpqc_device_info]);
+        $query = DB::connection('mysql')
+            ->table('dmrpqc_product_identifications')
+            ->where('device_name', $request->device_name)
+            ->where('logdel', 0);
+
+        // Optional status filter
+        if($request->has('mode') && $request->mode == 'OQC') {
+            $query->where('status', 2)->where('process_status', 5);
+        }
+
+        $dmrpqc_device_info = $query->orderBy('id', 'desc')->first();
+
+        return response()->json([
+            'dmrpqc_device_info' => $dmrpqc_device_info
+        ]);
     }
 
     public function GetUsersByPosition(Request $request){

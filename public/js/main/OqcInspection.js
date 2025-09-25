@@ -1,4 +1,24 @@
-
+function fetchData(params, callback) {
+    $.ajax({
+        url: 'get_dmrpqc_by_name',   // Change to your backend route
+        type: 'get',
+        data: {
+            device_name: params,     // Example data
+            mode: 'OQC'
+        },
+        success: function(response) {
+            if(typeof callback === "function") {
+                callback(response);  // Pass response to callback
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error:", error);
+            if (typeof callback === "function") {
+                callback(null, error); // Send error if needed
+            }
+        }
+    });
+}
 
 function SetClassRemove(elementId, value){
     $(`.${elementId}`).removeClass('btn-dark')
