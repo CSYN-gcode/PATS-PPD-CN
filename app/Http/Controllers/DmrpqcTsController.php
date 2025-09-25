@@ -36,7 +36,7 @@ class DmrpqcTsController extends Controller
 
         // Optional status filter
         if($request->has('mode') && $request->mode == 'OQC') {
-            $query->where('status', 2)->where('process_status', 5);
+            $query->where('status', 3)->where('process_status', 9);
         }
 
         $dmrpqc_device_info = $query->orderBy('id', 'desc')->first();

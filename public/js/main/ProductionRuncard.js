@@ -197,7 +197,7 @@ $(document).ready(function(){
                 success: function (response) {
                     let data = response['dmrpqc_device_info'];
 
-                    if(data.length > 0){
+                    if(response.dmrpqc_device_info > 0){
                         $('#modalProdRuncard').modal('show');
                         $('#txtPartName').val($('#txtSelectDeviceName').val());
                         $('#txtPartCode').val($('#txtSearchDeviceCode').val());
