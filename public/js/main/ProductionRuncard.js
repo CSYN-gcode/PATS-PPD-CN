@@ -196,8 +196,7 @@ $(document).ready(function(){
                 dataType: "json",
                 success: function (response) {
                     let data = response['dmrpqc_device_info'];
-
-                    if(response.dmrpqc_device_info > 0){
+                    if(data){
                         $('#modalProdRuncard').modal('show');
                         $('#txtPartName').val($('#txtSelectDeviceName').val());
                         $('#txtPartCode').val($('#txtSearchDeviceCode').val());
@@ -402,7 +401,8 @@ $(document).ready(function(){
                 GetMachineNo($('.SelMachineNo'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].machine_no);
 
                 $('#formProductionRuncard #txtPOQty').val(prod_runcard_data[0].po_quantity);
-                $('#formProductionRuncard #txtRequiredOutput').val(prod_runcard_data[0].required_qty);
+                // $('#formProductionRuncard #txtRequiredOutput').val(prod_runcard_data[0].required_qty);
+                $('#formProductionRuncard #txtRequiredOutput').val($('#txtSearchReqOutput').val());
                 $('#formProductionRuncard #txtProductionLot').val(prod_runcard_data[0].production_lot);
                 $('#formProductionRuncard #txtDrawingNo').val(prod_runcard_data[0].drawing_no);
                 $('#formProductionRuncard #txtDrawingRev').val(prod_runcard_data[0].drawing_rev);
@@ -838,7 +838,8 @@ $(document).ready(function(){
                 GetMachineNo($('.SelMachineNo'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].machine_no);
 
                 $('#formProductionRuncard #txtPOQty').val(prod_runcard_data[0].po_quantity);
-                $('#formProductionRuncard #txtRequiredOutput').val(prod_runcard_data[0].required_qty);
+                // $('#formProductionRuncard #txtRequiredOutput').val(prod_runcard_data[0].required_qty);
+                $('#formProductionRuncard #txtRequiredOutput').val($('#txtSearchReqOutput').val());
 
                 // console.log('production lot lenght',prod_runcard_data[0].production_lot.length);
                 if(prod_runcard_data[0].production_lot.length >= 17){
@@ -1401,8 +1402,6 @@ $(document).ready(function(){
                     loop_count = cavity_count_data.cavity_count
                     category = 'new';
                 }
-
-                console.log('loopcount', loop_count);
 
                 var tbody = $('#tableCavityCount tbody');
                     tbody.empty(); // clear old rows

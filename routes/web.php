@@ -364,7 +364,7 @@ Route::controller(PreShipmentController::class)->group(function(){
     Route::get('/get_users_by_pos', 'getUsersByPos')->name('get_users_by_pos');
     Route::get('/get_preshipment_by_id', 'getPreShipDetailsById')->name('get_preshipment_by_id');
     Route::get('/get_preshipment_to_print', 'getPreShipmentForPrint')->name('get_preshipment_to_print');
-    Route::post('/get_preview_qr_code', 'getPreShipDataForPreview')->name('get_prod_runcard_qr_code');
+    Route::post('/get_preview_qr_code', 'getPreShipDataForPreview')->name('get_preview_qr_code');
     Route::get('/get_po_from_delivery_update', 'GetPOFromDeliveryUpdate')->name('get_po_from_delivery_update');
     Route::get('/get_data_from_delivery_update', 'searchPoDeliveryUpdate')->name('get_data_from_delivery_update');
 
