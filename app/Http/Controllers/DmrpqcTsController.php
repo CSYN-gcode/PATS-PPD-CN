@@ -117,7 +117,17 @@ class DmrpqcTsController extends Controller
                         ->select('dmrpqc.*', DB::raw("CONCAT(users.firstname, ' ', users.lastname) AS full_name"), 'users.user_level_id')
                         ->leftJoin('users', 'dmrpqc.created_by', '=', 'users.id')
                         ->leftJoin('dmrpqc_product_req_checkings AS prod_req_checking', 'dmrpqc.id', '=', 'prod_req_checking.request_id')
-                        ->addSelect('prod_req_checking.id AS prod_req_checking_id', 'prod_req_checking.status AS prod_req_checking_status')
+                        // ->leftJoin('dmrpqc_product_req_checking_details AS prod_req_checking_details', function ($join) {
+                        //     $join->on('prod_req_checking.id', '=', 'prod_req_checking_details.prod_req_checking_id')
+                        //         ->where('prod_req_checking_details.logdel', 0);
+                        // })
+                        ->addSelect('prod_req_checking.id AS prod_req_checking_id',
+                                    'prod_req_checking.status AS prod_req_checking_status',
+                                    DB::raw('(SELECT MAX(details.process_category) 
+                                        FROM dmrpqc_product_req_checking_details AS details 
+                                        WHERE details.prod_req_checking_id = prod_req_checking.id 
+                                        AND details.logdel = 0) AS max_process_category')
+                        )
                         ->leftJoin('dmrpqc_machine_parameter_checkings AS mach_param_chckng', 'dmrpqc.id', '=', 'mach_param_chckng.request_id')
                         ->addSelect('mach_param_chckng.id AS mach_param_chckng_id', 'mach_param_chckng.status AS mach_param_chckng_status')
                         // ->when((in_array(5, $process_status_by_position)), function ($query){
@@ -359,7 +369,7 @@ class DmrpqcTsController extends Controller
                                         dmrpqc_id="'.$dmrpqc_details->id.'"><i class="fa-solid fa-file-pdf fa-xl" title="Export"></i></button>';
                             $result .= $action_btn_view;
                         }
-                        // break;
+                        // break; 
                     // case $user_level_id == 2 || $user_level_id == 3: //ADMINISTRATOR || PPS-ADMIN
                     //     if ($dmrpqc_details->status == 0){ //Status 0 = For Submission
                     //             $result .= $action_btn_submit;
@@ -490,7 +500,7 @@ class DmrpqcTsController extends Controller
                                     $result .= '<span class="badge badge-pill badge-primary">Production/Process Engr.</span></center>';
                                     break;
                                 case 5: //Production/Process Engr.
-                                    switch ($dmrpqc_details->prod_req_checking_status) {
+                                    switch ($dmrpqc_details->prod_req_checking_status){
                                         case 0:
                                             $result .= '<span class="badge badge-pill badge-primary">Production/Process/Die Maintenance Engr./QC</span></center>';
                                             break;
@@ -504,7 +514,11 @@ class DmrpqcTsController extends Controller
                                             $result .= '<span class="badge badge-pill badge-primary">Line Quality Control</span></center>';
                                             break;
                                         case 4:
-                                            $result .= '<span class="badge badge-pill badge-primary">Process Engineering</span></center>';
+                                            if($dmrpqc_details->max_process_category == 3){
+                                                $result .= '<span class="badge badge-pill badge-primary">Line Quality Control</span></center>';
+                                            }else{
+                                                $result .= '<span class="badge badge-pill badge-primary">Process Engineering</span></center>';
+                                            }
                                             break;
                                     }
                                     break;
@@ -701,6 +715,10 @@ class DmrpqcTsController extends Controller
                 ->where('die_cycle.dc_d_id', $pps_db_details[0]->dieset_id)
                 // ->where('device.md_device_name', 'LIKE', "%$part_name%")
                 ->first();
+
+        if(empty($device_dmcms)){
+            return response()->json(['result' => '2']);
+        }
 
         $shots_details_dmcms = DB::connection('mysql_rapid_molding_dmcms')
                 ->table('t_shots')
@@ -1026,10 +1044,10 @@ class DmrpqcTsController extends Controller
             if(isset(Auth::user()->id)){
                 $prod_req_checking_status = DmrpqcProductReqChecking::select('id','status')->where('request_id', $request->request_id)->first();
 
-                if($prod_req_checking_status->status < 2){
+                if($prod_req_checking_status->status <= 1){//for status 0,1 only
                     $status = $prod_req_checking_status->status + 1;
                 }else{//Update to status 4 to skip ENGR input
-                    $status = $prod_req_checking_status->status + 2;
+                    $status = $prod_req_checking_status->status + 3;
                 }
 
                 switch ($prod_req_checking_status->status){
@@ -1068,7 +1086,7 @@ class DmrpqcTsController extends Controller
                         ->update([
                             'last_updated_by' => $request->user_id,
                             'updated_at' => date('Y-m-d H:i:s'),
-                            'status' => $status //Change Status to Updated(2)
+                            'status' => $status //Change Status
                         ]);
 
                     if($prod_req_checking_status->status == 0){ //PRODUCTION
@@ -1464,7 +1482,9 @@ class DmrpqcTsController extends Controller
         // return $machine_setup_details;
 
         if($request->process_status >= 5 && $machine_setup_details[0]->first_remarks != 3){ //09/26/2024 p4 first is not mold down
-            $product_req_checking_details = DmrpqcProductReqChecking::with(['prod_req_checking_details'])->where('request_id', $request->id)->where('logdel', 0)->get();
+            $product_req_checking_details = DmrpqcProductReqChecking::with(['prod_req_checking_details' => function($q) {
+                                                $q->where('logdel', 0);
+                                            }])->where('request_id', $request->id)->where('logdel', 0)->get();
             // return $product_req_checking_details;
             // if($product_req_checking_details[0]->prod_visual_insp_name == '' || $product_req_checking_details[0]->prod_dimension_insp_name == ''){
             //     $product_req_checking_details = '';
@@ -1589,8 +1609,7 @@ class DmrpqcTsController extends Controller
                     }
                     return response()->json(['result' => "Successful"]);
                     // }
-                }
-                elseif($request->process_status == 2){ //Part 2. Dieset Condition & Part 3. Checking
+                }elseif($request->process_status == 2){ //Part 2. Dieset Condition & Part 3. Checking
 
                     $dieset_condition = DmrpqcDiesetCondition::where('request_id', $request->request_id)->first();
                     $dieset_condition_checking = DmrpqcDiesetConditionChecking::where('request_id', $request->request_id)->first();
@@ -1652,7 +1671,6 @@ class DmrpqcTsController extends Controller
                 }elseif($request->process_status == 5){ //Part 5. Product Requirement Checking
 
                     $product_req_checking = DmrpqcProductReqChecking::select(['request_id', 'status'])->where('request_id', $request->request_id)->first();
-                    // return $product_req_checking['request_id'];
                     // Conform: if request_id is not existing in machine setup table
                     if(!isset($product_req_checking['request_id'])){
                         // if(!isset($product_req_checking['status'])){ //Update p1 to next part
@@ -1662,16 +1680,17 @@ class DmrpqcTsController extends Controller
                                                         'created_by' => $dmrpqc_user_id,
                                                         'last_updated_by' => $dmrpqc_user_id,
                                                         'created_at' => date('Y-m-d H:i:s'),
-                                                        'updated_at' => date('Y-m-d H:i:s'),]);
+                                                        'updated_at' => date('Y-m-d H:i:s')]);
 
                         DmrpqcMachineSetupSample::insert(['request_id' => $request->request_id,
                                                         'created_by' => $dmrpqc_user_id,
                                                         'last_updated_by' => $dmrpqc_user_id,
                                                         'created_at' => date('Y-m-d H:i:s'),
-                                                        'updated_at' => date('Y-m-d H:i:s'),]);
+                                                        'updated_at' => date('Y-m-d H:i:s')]);
 
                         return response()->json(['result' => "Successful"]);
-                        //Submit: if there is request_id exist in machine setup table and the status is 1(Updated)
+                        
+                    //Submit: if there is request_id exist in machine setup table and the status is 1(Updated)
                     }elseif(isset($product_req_checking['request_id'])){
 
                         // $product_req_checking['request_id']

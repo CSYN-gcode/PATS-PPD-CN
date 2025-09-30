@@ -10,6 +10,6 @@ class DmrpqcProductReqChecking extends Model
     use HasFactory;
 
     public function prod_req_checking_details(){
-        return $this->hasMany(DmrpqcProductReqCheckingDetails::class, 'prod_req_checking_id','id');
+        return $this->hasMany(DmrpqcProductReqCheckingDetails::class, 'prod_req_checking_id','id')->where('logdel', 0);
     }
 }
