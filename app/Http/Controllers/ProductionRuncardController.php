@@ -532,10 +532,6 @@ class ProductionRuncardController extends Controller
                                     ->first();
 
                 $cav_data_mode = 'new';
-                // $cavity_count_data->category = 'new';
-                // $cavity_count_data->input_quantity  = 0;
-                // $cavity_count_data->output_quantity = 0;
-                // $cavity_count_data->ng_quantity     = 0;
             }else{
                 $cav_data_mode = 'edit';
             }
@@ -558,18 +554,14 @@ class ProductionRuncardController extends Controller
         // ]);
 
         // if($request->runcard_station == 4){ //Lubricant Coating
-        //     $validate_array = ['runcard_station' => 'required', 'p_zero_two_prod_lot' => 'required'];
-        // }else if($request->runcard_station == 5){//Lot Marking
-        //     $validate_array = ['runcard_station' => 'required', 's_zero_seven_prod_lot' => 'required', 's_zero_two_prod_lot' => 'required'];
-        // }else if($request->runcard_station == 6){//Visual Inspection
-        //     $validate_array = ['runcard_station' => 'required', ];
+            $validate_array = ['runcard_station' => 'required'];
         // }
 
-        // $validator = Validator::make($data, $validate_array);
+        $validator = Validator::make($data, $validate_array);
 
-        // if ($validator->fails()) {
-        //     return response()->json(['validation' => 'hasError', 'error' => $validator->messages()]);
-        // }else {
+        if ($validator->fails()) {
+            return response()->json(['validation' => 'hasError', 'error' => $validator->messages()]);
+        }else {
 
             try{
                 if(!isset($request->frmstations_runcard_station_id)){
@@ -693,7 +685,7 @@ class ProductionRuncardController extends Controller
             } catch (\Throwable $th) {
                 return $th;
             }
-        // }
+        }
     }
 
     public function UpdateProdRuncardStatus(Request $request){
@@ -985,22 +977,35 @@ class ProductionRuncardController extends Controller
                                     ->get();
                                     // ->pluck('operator_name');
 
-        // $cavity_details = DB::table('production_runcard_cavities')
-        //                             ->where('prod_runcards_id', $runcard->id)
-        //                             ->whereNull('deleted_at')
-        //                             ->get();
+        $cavity_details = DB::table('production_runcard_cavities')
+                                    ->where('prod_runcards_id', $runcard->id)
+                                    ->whereNull('deleted_at')
+                                    ->get();
 
-        // if($cavity_details->isEmpty()){
-        //     // Handle empty cavity details case
-        //         $cavity_details = DB::table('devices')
-        //                             ->select("cavity_count")
-        //                             ->where('name', $runcard->part_name)
-        //                             ->where('status', 1)
-        //                             ->first();
-        // }
-                                    // return $cavity_details;
+        if($cavity_details->isEmpty()){
+                // Handle empty cavity details case
+                $cavity_details = DB::table('devices')
+                                    ->select("cavity_count", "qty_per_reel", "qty_per_box")
+                                    ->where('name', $runcard->part_name)
+                                    ->where('status', 1)
+                                    ->first();
+
+                $cavity_details = $cavity_details ? collect([$cavity_details]) : collect([]);
+        }
+        // return $cavity_details;
+
+        $bundle_details = DB::table('devices')
+                                    ->select("cavity_count", "qty_per_reel", "qty_per_box")
+                                    ->where('name', $runcard->part_name)
+                                    ->where('status', 1)
+                                    ->first();
+
+        $bundle_count = ($bundle_details->qty_per_box / $bundle_details->qty_per_reel) / $bundle_details->cavity_count;
+        // return $bundle_count;
+        // return $cavity_details;
+                                    
         $all_operator_names = [];
-        foreach ($operator_name_per_runcard as $row) {
+        foreach ($operator_name_per_runcard as $row){
             $all_operator_names[] = $row->operator_name;
         }
         $all_operator_names = implode(', ', $all_operator_names);
@@ -1021,84 +1026,107 @@ class ProductionRuncardController extends Controller
 
         // container for multiple QR codes
         $data = [];
+        // if(count($cavity_details) == 1){
+            
+        // }else{
+            // return $bundle_details->qty_per_box;
+            foreach($cavity_details as $details){
+                if(count($cavity_details) == 1){
+                    if(isset($details->cavity_count)){
+                        $details->cavity = $details->cavity_count;
+                        $details->output_quantity = $runcard->shipment_output;
+                    }
+                }
+                
+                for($i = 1; $i <= $bundle_count; $i++){
+                    $sticker_count = $i . '/' . $bundle_count;
 
-        // for ($i = 0; $i < count($cavity_details); $i++){
+                    $qrPayload = [
+                        'po_number'         => $runcard->po_number,
+                        'po_quantity'       => $runcard->po_quantity,
+                        'part_name'         => $runcard->part_name,
+                        'part_code'         => $runcard->part_code,
+                        'production_lot'    => $runcard->production_lot,
+                        'shipment_output'   => $runcard->shipment_output,
+                        'runcard_status'    => $runcard->runcard_status,
+                        'cavity'            => $details->cavity,
+                        'cav_output_qty'    => $details->output_quantity / $bundle_count,
+                    ];
 
-            // $qrPayload = [
-            //     'po_number'         => $runcard->po_number,
-            //     'po_quantity'       => $runcard->po_quantity,
-            //     'part_name'         => $runcard->part_name,
-            //     'part_code'         => $runcard->part_code,
-            //     'production_lot'    => $runcard->production_lot,
-            //     'shipment_output'   => $runcard->shipment_output,
-            //     'runcard_status'    => $runcard->runcard_status,
-            //     'cavity'            => $cavity_details[$i]->cavity,
-            //     'cav_output_qty'    => $cavity_details[$i]->output_quantity,
-            // ];
+                    $qrcode = QrCode::format('png')
+                                    ->size(300)->errorCorrection('H')
+                                    ->generate(json_encode($qrPayload));
 
-            $qrcode = QrCode::format('png')
-                            ->size(300)->errorCorrection('H')
-                            ->generate(json_encode($runcard));
+                    $qr_code = "data:image/png;base64,".base64_encode($qrcode);
+                    $print_status!='For OQC'?'':$print_status;
 
-            $qr_code = "data:image/png;base64,".base64_encode($qrcode);
-            $print_status!='For OQC'?'':$print_status;
+                    if(count($cavity_details) == 1){
+                        $cavity     = '';
+                    }else if($bundle_count == 1){
+                        $cavity     = '<strong>Cavity '.$details->cavity.'</strong><br>';
+                    }else{
+                        $cavity     = '<strong>Cavity '.$details->cavity.' ('.$sticker_count.')</strong><br>';
+                    }
 
-            // $cavity         = 'Cavity '.$cavity_details[$i]->cavity;
-            // $cavity_qty     = $cavity_details[$i]->output_quantity;
+                    $cavity_qty     = $details->output_quantity / $bundle_count;
 
-            $data[] = [
-                'img'  => $qr_code,
-                'text' =>  "<strong>$runcard->po_number</strong><br>
-                <strong>$runcard->po_quantity</strong><br>
-                <strong>$runcard->part_name</strong><br>
-                <strong>$runcard->part_code</strong><br>
-                <strong>$runcard->production_lot</strong><br>
-                <strong>$shipment_output</strong><br>
-                <strong>$all_operator_names</strong><br>
-                "
-                // <strong>$cavity</strong><br>
-                // <strong>$cavity_qty</strong><br>
-                // <strong>$shipment_output</strong><br>
-                // <strong>$print_status</strong><br> //clark comment 01/08/2025
-            ];
+                    $data[] = [
+                        'img'  => $qr_code,
+                        'text' =>  "<strong>$runcard->po_number</strong><br>
+                                    <strong>$runcard->po_quantity</strong><br>
+                                    <strong>$runcard->part_name</strong><br>
+                                    <strong>$runcard->part_code</strong><br>
+                                    <strong>$runcard->production_lot</strong><br>
+                                    $cavity
+                                    <strong>$cavity_qty</strong><br>
+                                    <strong>$all_operator_names</strong><br>"
 
-            $label = "
-                <table class='table table-sm table-borderless' style='width: 100%;'>
-                    <tr>
-                        <td>PO No:</td>
-                        <td>$runcard->po_number</td>
-                    </tr>
-                    <tr>
-                        <td>PO Quantity:</td>
-                        <td>$runcard->po_quantity</td>
-                    </tr>
-                    <tr>
-                        <td>Device Name:</td>
-                        <td>$runcard->part_name</td>
-                    </tr>
-                    <tr>
-                        <td>Part Code:</td>
-                        <td>$runcard->part_code</td>
-                    </tr>
-                    <tr>
-                        <td>Production Lot #:</td>
-                        <td>$runcard->production_lot</td>
-                    </tr>
-                    <tr>
-                        <td>Shipment Output:</td>
-                        <td>$shipment_output</td>
-                    </tr>
-                    <tr>
-                        <td>Operator Name:</td>
-                        <td>$all_operator_names</td>
-                    </tr>
-                    <tr>
-                        <td>QR Purpose:</td>
-                        <td>$print_status</td>
-                    </tr>
-                </table>
-            ";
+                        // <strong>$cavity</strong><br>
+                        // <strong>$cavity_qty</strong><br>
+                        // <strong>$shipment_output</strong><br>
+                        // <strong>$print_status</strong><br> //clark comment 01/08/2025
+                    ];
+
+                    $label = "
+                        <table class='table table-sm table-borderless' style='width: 100%;'>
+                            <tr>
+                                <td>PO No:</td>
+                                <td>$runcard->po_number</td>
+                            </tr>
+                            <tr>
+                                <td>PO Quantity:</td>
+                                <td>$runcard->po_quantity</td>
+                            </tr>
+                            <tr>
+                                <td>Device Name:</td>
+                                <td>$runcard->part_name</td>
+                            </tr>
+                            <tr>
+                                <td>Part Code:</td>
+                                <td>$runcard->part_code</td>
+                            </tr>
+                            <tr>
+                                <td>Production Lot #:</td>
+                                <td>$runcard->production_lot</td>
+                            </tr>
+                            <tr>
+                                <td>Shipment Output:</td>
+                                <td>$shipment_output</td>
+                            </tr>
+                            <tr>
+                                <td>Operator Name:</td>
+                                <td>$all_operator_names</td>
+                            </tr>
+                            <tr>
+                                <td>QR Purpose:</td>
+                                <td>$print_status</td>
+                            </tr>
+                        </table>
+                    ";
+                }
+            }
         // }
+        
         return response()->json(['qr_code' => $qr_code, 'label_hidden' => $data, 'label' => $label, 'production_runcard_data' => $runcard]);
     }
 }

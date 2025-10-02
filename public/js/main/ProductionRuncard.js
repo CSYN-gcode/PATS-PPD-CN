@@ -947,54 +947,97 @@ $(document).ready(function(){
         CheckExistingStations(runcard_id);
         CheckExistingSubStations(runcard_id);
 
-        // console.log('station', $('#txtSelectRuncardStation option:selected').text());
-        // console.log('sub station', $('#txtSelectRuncardSubStation option:selected').text());
+        setTimeout(function(){
+            if($('#txtSelectRuncardStation option:selected').text() == 'Visual Inspection' && $('#txtSelectRuncardSubStation option:selected').text() == 'Visual Inspection'){
+                fetchCavityCount();
+                // let tbody = $('#tableCavityCount tbody');
+                // $.ajax({
+                //     url: "get_cavity_count", // your API endpoint
+                //     type: "get",
+                //     data: {
+                //         "device_name" : $('#formProductionRuncard').find('#txtPartName').val(),
+                //     },
+                //     dataType: 'json',
+                //     cache: false, // avoids old/stale response
+                //     beforeSend: function(){
+                //         tbody.empty(); // always clear before loading
+                //     },
+                //     success: function(response){
+                //         let cavityCount = parseInt(response?.data?.cavity_count) || 0;
+                //         let inputQty  = parseInt($('#formAddProductionRuncardStation #txtInputQuantity').val()) || 0;
+                //         let inputCavityVal = cavityCount > 0 ? Math.floor(inputQty / cavityCount) : 0;
 
-        if($('#txtSelectRuncardStation option:selected').text() == 'Visual Inspection' && $('#txtSelectRuncardSubStation option:selected').text() == 'Visual Inspection'){
-            // Fetch cavity count from server
-            $.ajax({
-                url: "get_cavity_count", // your API endpoint
-                type: "get",
-                data: {
-                    "device_name" : $('#formProductionRuncard').find('#txtPartName').val(),
-                },
-                dataType: 'json',
-                success: function(response){
-                    let cavityCount = response.data.cavity_count; // ex: 2, 3, etc.
-                    let inputCavityVal = parseInt($('#formAddProductionRuncardStation').find('#txtInputQuantity').val()) / cavityCount;
-                    let tbody = $('#tableCavityCount tbody');
-                    tbody.empty(); // clear old rows
+                //         console.log('inputQty', inputQty);
+                //         console.log('inputCavityVal', inputCavityVal);
+                //         console.log('test_count', cavityCount);
+                //         for(let i = 1; i <= cavityCount; i++){
+                //             let cavityLabel = String.fromCharCode(64 + i);
+                //             let row = `
+                //                 <tr>
+                //                     <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}" readonly></td>
+                //                     <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" value="${inputCavityVal}" readonly></td>
+                //                     <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0"></td>
+                //                     <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" readonly></td>
+                //                 </tr>
+                //             `;
+                //             tbody.append(row);
+                //         }
+                //         $('#CavityCountDiv').removeClass('d-none');
+                //     }
+                // });
+            }else{
+                $('#CavityCountDiv').addClass('d-none');
+            }
 
-                    for(let i = 1; i <= cavityCount; i++){
-                        let cavityLabel = String.fromCharCode(64 + i);
-                        let row = `
-                            <tr>
-                                <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}" readonly></td>
-                                <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" value="${inputCavityVal}" readonly></td>
-                                <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0"></td>
-                                <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" readonly></td>
-                            </tr>
-                        `;
-                        tbody.append(row);
-                    }
+            // $('#buttonAddRuncardModeOfDefect').prop('hidden', false);
+            $('#formAddProductionRuncardStation #txtFrmStationsRuncardId').val(runcard_id);
+            $("#buttonAddRuncardModeOfDefect").prop('disabled', true);
 
-                    // show the div if hidden
+            $("#txtInputQuantity").prop('disabled', false);
+            $("#txtOutputQuantity").prop('disabled', false);
+            $("#txtNgQuantity").prop('disabled', false);
+            $("#txtRemarks").prop('disabled', false);
+        }, 300); // adjust delay as needed
+    });
+
+    function fetchCavityCount() {
+        let tbody = $('#tableCavityCount tbody');
+        $.ajax({
+            url: "get_cavity_count",
+            type: "get",
+            data: {
+                "device_name": $('#formProductionRuncard #txtPartName').val(),
+            },
+            dataType: 'json',
+            cache: false,
+            beforeSend: function () {
+                tbody.empty();
+            },
+            success: function (response) {
+                let cavityCount = parseInt(response?.data?.cavity_count) || 0;
+                let inputVal = $('#formAddProductionRuncardStation #txtInputQuantity').val();
+                let inputQty = parseInt(inputVal) || 0;
+
+                let inputCavityVal = cavityCount > 0 ? Math.floor(inputQty / cavityCount) : 0;
+
+                for (let i = 1; i <= cavityCount; i++) {
+                    let cavityLabel = String.fromCharCode(64 + i);
+                    tbody.append(`
+                        <tr>
+                            <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}" readonly></td>
+                            <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" value="${inputCavityVal}" readonly></td>
+                            <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0"></td>
+                            <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" readonly></td>
+                        </tr>
+                    `);
+                }
+
+                if (cavityCount > 0) {
                     $('#CavityCountDiv').removeClass('d-none');
                 }
-            });
-        }else{
-            $('#CavityCountDiv').addClass('d-none');
-        }
-
-        // $('#buttonAddRuncardModeOfDefect').prop('hidden', false);
-         $('#formAddProductionRuncardStation #txtFrmStationsRuncardId').val(runcard_id);
-         $("#buttonAddRuncardModeOfDefect").prop('disabled', true);
-
-        $("#txtInputQuantity").prop('disabled', false);
-        $("#txtOutputQuantity").prop('disabled', false);
-        $("#txtNgQuantity").prop('disabled', false);
-        $("#txtRemarks").prop('disabled', false);
-    });
+            }
+        });
+    }
 
     // let ngTimeout; // global timeout holder
 
@@ -1004,7 +1047,7 @@ $(document).ready(function(){
 
         let inputVal = parseInt(row.find('.cls_input').val()) || 0;
         let outputVal = parseInt(row.find('.cls_output').val()) || 0;
-        let stationOutputQty = $('#formAddProductionRuncardStation').find('#txtNgQuantity').val();
+        let stationNgQty = $('#formAddProductionRuncardStation').find('#txtNgQuantity').val();
 
         // NG = Input - Output (but prevent negatives)
         console.log('ng value', $('#formAddProductionRuncardStation').find('#txtNgQuantity').val());
@@ -1021,11 +1064,11 @@ $(document).ready(function(){
 
             if(ngVal < 0){
                 swal_title = 'NG Quantity cannot be less than Zero!';
-            }else if(ngVal > stationOutputQty){
-                swal_title = 'NG Quantity cannot be less than Zero!';
+            }else if(ngVal > stationNgQty){
+                swal_title = 'NG Quantity cannot be greater than Station NG Quantity!';
             }
 
-            if(ngVal < 0 || ngVal > stationOutputQty){
+            if(ngVal < 0 || ngVal > stationNgQty){
                 Swal.fire({
                     position: "center",
                     icon: "error",
@@ -1304,6 +1347,7 @@ $(document).ready(function(){
         // CLARK NEW CODE
         $("#formAddQualiDetails")[0].reset();
         $('.QualiDetailsDiv').addClass('d-none', true);
+        $('#tableCavityCount tbody').empty();
         // CLARK NEW CODE
 
         // $('#LubricantCoatingDiv').addClass('d-none', true);
@@ -1316,6 +1360,9 @@ $(document).ready(function(){
     });
 
     function GetProdRuncardStationData(prodRuncardId, prodRuncardStationsId){
+        let tbody = $('#tableCavityCount tbody');
+        let loop_count = 0;
+
         $.ajax({
             url: "get_prod_runcard_data",
             type: "get",
@@ -1390,7 +1437,7 @@ $(document).ready(function(){
                 GetStations($('#txtSelectRuncardStation'), station_data.station_step);
                 GetSubStations($('#txtSelectRuncardSubStation'), station_data.sub_station_step);
 
-                let loop_count = 0;
+                loop_count = 0;
                 let input_val = 0;
                 let output_val = 0;
                 let ng_val = 0;
@@ -1403,9 +1450,7 @@ $(document).ready(function(){
                     category = 'new';
                 }
 
-                var tbody = $('#tableCavityCount tbody');
-                    tbody.empty(); // clear old rows
-
+                tbody.empty(); // clear old rows
                 for(var i = 0; i < loop_count; i++){
 
                     if(category == 'edit'){
