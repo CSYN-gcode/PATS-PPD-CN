@@ -1000,10 +1000,21 @@ class ProductionRuncardController extends Controller
                                     ->where('status', 1)
                                     ->first();
 
-        $bundle_count = ($bundle_details->qty_per_box / $bundle_details->qty_per_reel) / $bundle_details->cavity_count;
+        if($bundle_details->qty_per_box > 0 && $bundle_details->qty_per_reel > 0){
+            $box_over_bundle = $bundle_details->qty_per_box / $bundle_details->qty_per_reel;
+        }else{
+            $box_over_bundle = 1;
+        }
+
+        if($box_over_bundle > 1){
+            $bundle_count = $box_over_bundle / $bundle_details->cavity_count;
+        }else{
+            $bundle_count = 1;
+        }
+
         // return $bundle_count;
         // return $cavity_details;
-                                    
+
         $all_operator_names = [];
         foreach ($operator_name_per_runcard as $row){
             $all_operator_names[] = $row->operator_name;
@@ -1026,10 +1037,7 @@ class ProductionRuncardController extends Controller
 
         // container for multiple QR codes
         $data = [];
-        // if(count($cavity_details) == 1){
-            
-        // }else{
-            // return $bundle_details->qty_per_box;
+
             foreach($cavity_details as $details){
                 if(count($cavity_details) == 1){
                     if(isset($details->cavity_count)){
@@ -1037,7 +1045,7 @@ class ProductionRuncardController extends Controller
                         $details->output_quantity = $runcard->shipment_output;
                     }
                 }
-                
+
                 for($i = 1; $i <= $bundle_count; $i++){
                     $sticker_count = $i . '/' . $bundle_count;
 
@@ -1050,7 +1058,7 @@ class ProductionRuncardController extends Controller
                         'shipment_output'   => $runcard->shipment_output,
                         'runcard_status'    => $runcard->runcard_status,
                         'cavity'            => $details->cavity,
-                        'cav_output_qty'    => $details->output_quantity / $bundle_count,
+                        'cav_output_qty'    => $details->output_quantity / $bundle_count
                     ];
 
                     $qrcode = QrCode::format('png')
@@ -1126,7 +1134,7 @@ class ProductionRuncardController extends Controller
                 }
             }
         // }
-        
+
         return response()->json(['qr_code' => $qr_code, 'label_hidden' => $data, 'label' => $label, 'production_runcard_data' => $runcard]);
     }
 }

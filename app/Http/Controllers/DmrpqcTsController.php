@@ -123,9 +123,9 @@ class DmrpqcTsController extends Controller
                         // })
                         ->addSelect('prod_req_checking.id AS prod_req_checking_id',
                                     'prod_req_checking.status AS prod_req_checking_status',
-                                    DB::raw('(SELECT MAX(details.process_category) 
-                                        FROM dmrpqc_product_req_checking_details AS details 
-                                        WHERE details.prod_req_checking_id = prod_req_checking.id 
+                                    DB::raw('(SELECT MAX(details.process_category)
+                                        FROM dmrpqc_product_req_checking_details AS details
+                                        WHERE details.prod_req_checking_id = prod_req_checking.id
                                         AND details.logdel = 0) AS max_process_category')
                         )
                         ->leftJoin('dmrpqc_machine_parameter_checkings AS mach_param_chckng', 'dmrpqc.id', '=', 'mach_param_chckng.request_id')
@@ -369,7 +369,7 @@ class DmrpqcTsController extends Controller
                                         dmrpqc_id="'.$dmrpqc_details->id.'"><i class="fa-solid fa-file-pdf fa-xl" title="Export"></i></button>';
                             $result .= $action_btn_view;
                         }
-                        // break; 
+                        // break;
                     // case $user_level_id == 2 || $user_level_id == 3: //ADMINISTRATOR || PPS-ADMIN
                     //     if ($dmrpqc_details->status == 0){ //Status 0 = For Submission
                     //             $result .= $action_btn_submit;
@@ -1689,7 +1689,7 @@ class DmrpqcTsController extends Controller
                                                         'updated_at' => date('Y-m-d H:i:s')]);
 
                         return response()->json(['result' => "Successful"]);
-                        
+
                     //Submit: if there is request_id exist in machine setup table and the status is 1(Updated)
                     }elseif(isset($product_req_checking['request_id'])){
 
