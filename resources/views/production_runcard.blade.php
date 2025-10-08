@@ -669,9 +669,27 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {{-- Cavity Count START --}}
                             <div id="CavityCountDiv" class="d-none">
+                                <div class="row">
+                                    <div class="col">
+                                        {{-- <div class="input-group input-group-sm mb-3"> --}}
+                                            <div class="form-check form-check-inline">
+                                                <label class="form-check-label"> No Cavity Count? </label>
+                                                &NonBreakingSpace;
+                                                <input type="checkbox" class="form-check-input" id="txtNoCavity" value="1">
+                                                &NonBreakingSpace;
+                                            </div>
+                                            {{-- <div class="input-group-prepend w-50">
+                                                <span class="input-group-text w-100">No Cavity Count?</span>
+                                            </div>
+                                                <input type="checkbox" class="form-check-input" id="txtNoCavity" value="1"> --}}
+                                                {{-- <input type="checkbox" class="form-control form-control-sm" id="txtNoCavity" name="no_cavity" min="0" readonly> --}}
+                                        {{-- </div> --}}
+                                    </div>
+                                </div>
+
                                 <div class="row">
                                     <div class="col">
                                         <div class="table-responsive">

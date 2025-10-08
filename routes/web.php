@@ -249,6 +249,7 @@ Route::controller(ProductionRuncardController::class)->group(function(){
     Route::post('/submit_prod_runcard', 'SubmitProdRuncard')->name('submit_prod_runcard');
     Route::get('/get_mode_of_defect_for_prod', 'GetModeOfDefect')->name('get_mode_of_defect_for_prod');
     Route::get('/get_cavity_count', 'getCavityCount')->name('get_cavity_count');
+    Route::get('/get_box_over_bundle', 'getBoxOverBundle')->name('get_box_over_bundle');
 });
 
 //Qualification Controller

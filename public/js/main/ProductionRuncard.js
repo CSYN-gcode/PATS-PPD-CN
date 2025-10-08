@@ -950,41 +950,6 @@ $(document).ready(function(){
         setTimeout(function(){
             if($('#txtSelectRuncardStation option:selected').text() == 'Visual Inspection' && $('#txtSelectRuncardSubStation option:selected').text() == 'Visual Inspection'){
                 fetchCavityCount();
-                // let tbody = $('#tableCavityCount tbody');
-                // $.ajax({
-                //     url: "get_cavity_count", // your API endpoint
-                //     type: "get",
-                //     data: {
-                //         "device_name" : $('#formProductionRuncard').find('#txtPartName').val(),
-                //     },
-                //     dataType: 'json',
-                //     cache: false, // avoids old/stale response
-                //     beforeSend: function(){
-                //         tbody.empty(); // always clear before loading
-                //     },
-                //     success: function(response){
-                //         let cavityCount = parseInt(response?.data?.cavity_count) || 0;
-                //         let inputQty  = parseInt($('#formAddProductionRuncardStation #txtInputQuantity').val()) || 0;
-                //         let inputCavityVal = cavityCount > 0 ? Math.floor(inputQty / cavityCount) : 0;
-
-                //         console.log('inputQty', inputQty);
-                //         console.log('inputCavityVal', inputCavityVal);
-                //         console.log('test_count', cavityCount);
-                //         for(let i = 1; i <= cavityCount; i++){
-                //             let cavityLabel = String.fromCharCode(64 + i);
-                //             let row = `
-                //                 <tr>
-                //                     <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}" readonly></td>
-                //                     <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" value="${inputCavityVal}" readonly></td>
-                //                     <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0"></td>
-                //                     <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" readonly></td>
-                //                 </tr>
-                //             `;
-                //             tbody.append(row);
-                //         }
-                //         $('#CavityCountDiv').removeClass('d-none');
-                //     }
-                // });
             }else{
                 $('#CavityCountDiv').addClass('d-none');
             }
@@ -1003,7 +968,8 @@ $(document).ready(function(){
     function fetchCavityCount() {
         let tbody = $('#tableCavityCount tbody');
         $.ajax({
-            url: "get_cavity_count",
+            // url: "get_cavity_count",
+            url: "get_box_over_bundle",
             type: "get",
             data: {
                 "device_name": $('#formProductionRuncard #txtPartName').val(),
@@ -1014,35 +980,49 @@ $(document).ready(function(){
                 tbody.empty();
             },
             success: function (response) {
-                let cavityCount = parseInt(response?.data?.cavity_count) || 0;
-                let inputVal = $('#formAddProductionRuncardStation #txtInputQuantity').val();
-                let inputQty = parseInt(inputVal) || 0;
+                let box_over_bundle = response.data;
+                let qty_per_box     = box_over_bundle.qty_per_box || 1;
+                let qty_per_reel    = box_over_bundle.qty_per_reel || 1;
+                let stickerCount    = parseInt(qty_per_box / qty_per_reel) || 1;
 
-                let inputCavityVal = cavityCount > 0 ? Math.floor(inputQty / cavityCount) : 0;
+                let inputQty = parseInt($('#formAddProductionRuncardStation #txtInputQuantity').val()) || 0;
+                let inputCavityVal = stickerCount > 0 ? Math.floor(inputQty / stickerCount) : 0;
 
-                for (let i = 1; i <= cavityCount; i++) {
-                    let cavityLabel = String.fromCharCode(64 + i);
-                    tbody.append(`
-                        <tr>
-                            <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}" readonly></td>
-                            <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" value="${inputCavityVal}" readonly></td>
-                            <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0"></td>
-                            <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" readonly></td>
-                        </tr>
-                    `);
-                }
-
-                if (cavityCount > 0) {
+                if(stickerCount > 1){
                     $('#CavityCountDiv').removeClass('d-none');
+                    for (let i = 1; i <= stickerCount; i++) {
+                        let cavityLabel = String.fromCharCode(64 + i);
+                        tbody.append(`
+                            <tr>
+                                <td><input type="text" name="cavity[]" class="form-control form-control-sm cls_cavity" value="${cavityLabel}"></td>
+                                <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" value="${inputCavityVal}" readonly></td>
+                                <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0"></td>
+                                <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" readonly></td>
+                            </tr>
+                        `);
+                    }
+                }else{
+                    $('#CavityCountDiv').addClass('d-none');
                 }
             }
         });
     }
 
-    // let ngTimeout; // global timeout holder
+    $('#tableCavityCount tbody').on('input', '.cls_cavity', function (){
+        $(this).val($(this).val().toUpperCase());
+    });
 
-    // Attach event listener for dynamic inputs
-    $(document).on('input', '.cls_input, .cls_output', function () {
+    $('#formAddProductionRuncardStation #txtNoCavity').click(function(e){
+        if($(this).prop('checked')){
+            $('#tableCavityCount tbody').find('.cls_cavity').val('N/A');
+            $('#tableCavityCount tbody').find('.cls_cavity').prop('readonly', true);
+        }else{
+            $('#tableCavityCount tbody').find('.cls_cavity').val('');
+            $('#tableCavityCount tbody').find('.cls_cavity').prop('readonly', false);
+        }
+    });
+
+    $('#tableCavityCount tbody').on('input', '.cls_input, .cls_output', function (){
         let row = $(this).closest('tr'); // find the row where the change happened
 
         let inputVal = parseInt(row.find('.cls_input').val()) || 0;
@@ -1148,24 +1128,46 @@ $(document).ready(function(){
 
     $(document).on('click', '#btnSaveNewRuncardStation',function(e){
         e.preventDefault();
-        $.ajax({
-            type:"POST",
-            url: "add_runcard_station_data",
-            data: $('#formAddProductionRuncardStation').serialize() + '&' + $('#formAddQualiDetails').serialize(),
-            dataType: "json",
-            success: function(response){
-                if(response['result'] == 1){
-                    toastr.success('Successful!');
-                    $('#formProductionRuncard #txtShipmentOutput').val(response['shipment_output']);
-                    $("#modalAddStation").modal('hide');
-                    dtProdRuncardStation.draw();
-                    CheckExistingStations($('#txtFrmStationsRuncardId').val(), 'updating');
-                    CheckExistingSubStations($('#txtFrmStationsRuncardId').val(), 'updating');
-                }else{
-                    toastr.error('Error!, Please Contanct ISS Local 208');
+        let SaveMode = 'Normal';
+        let stationNgQuantity = $('#formAddProductionRuncardStation').find('#txtNgQuantity').val();
+        let totalNgPerCavity = 0;
+        if($('#txtSelectRuncardStation option:selected').text() == 'Visual Inspection' && $('#txtSelectRuncardSubStation option:selected').text() == 'Visual Inspection'){
+            SaveMode = 'WithCavityQty';
+            $('#tableCavityCount tbody').find('.cls_ng').each(function(){
+                let val = parseFloat($(this).val()) || 0; // convert to number, or 0 if empty
+                totalNgPerCavity += val;
+            });
+        }
+
+        if(SaveMode === 'Normal' || (SaveMode === 'WithCavityQty' && totalNgPerCavity == stationNgQuantity)){
+            $.ajax({
+                type:"POST",
+                url: "add_runcard_station_data",
+                data: $('#formAddProductionRuncardStation').serialize() + '&' + $('#formAddQualiDetails').serialize(),
+                dataType: "json",
+                success: function(response){
+                    if(response['result'] == 1){
+                        toastr.success('Successful!');
+                        $('#formProductionRuncard #txtShipmentOutput').val(response['shipment_output']);
+                        $("#modalAddStation").modal('hide');
+                        dtProdRuncardStation.draw();
+                        CheckExistingStations($('#txtFrmStationsRuncardId').val(), 'updating');
+                        CheckExistingSubStations($('#txtFrmStationsRuncardId').val(), 'updating');
+                    }else{
+                        toastr.error('Error!, Please Contanct ISS Local 208');
+                    }
                 }
-            }
-        });
+            });
+        }else{
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Total NG per Cavity umst be equal to Station NG Quantity!",
+                showConfirmButton: false,
+                timer: 2000
+            });
+            return;
+        }
     });
 
     $(document).on('click', '.btnUpdateProdRuncardStationData',function(e){
@@ -1446,34 +1448,42 @@ $(document).ready(function(){
                     loop_count = cavity_count_data.length
                     category = 'edit';
                 }else if(response['cav_data_mode'] == 'new'){
-                    loop_count = cavity_count_data.cavity_count
+                    loop_count  = parseInt(cavity_count_data.qty_per_box / cavity_count_data.qty_per_reel) || 1;
                     category = 'new';
                 }
 
+                let inputQty = parseInt($('#formAddProductionRuncardStation #txtInputQuantity').val()) || 0;
+                input_val = loop_count > 0 ? Math.floor(inputQty / loop_count) : 0;
+
                 tbody.empty(); // clear old rows
-                for(var i = 0; i < loop_count; i++){
+                if(loop_count > 1){
+                    $('#CavityCountDiv').removeClass('d-none');
+                    for(var i = 1; i <= loop_count; i++){
 
-                    if(category == 'edit'){
-                        input_val = cavity_count_data[i].input_quantity;
-                        output_val = cavity_count_data[i].output_quantity;
-                        ng_val = cavity_count_data[i].ng_quantity;
+                        if(category == 'edit'){
+                            input_val = cavity_count_data[i].input_quantity;
+                            output_val = cavity_count_data[i].output_quantity;
+                            ng_val = cavity_count_data[i].ng_quantity;
+                        }
+                        // else if(category == 'new'){
+                        //     input_val = cavity_count_data.input_quantity;
+                        //     output_val = cavity_count_data.output_quantity;
+                        //     ng_val = cavity_count_data.ng_quantity;
+                        // }
+
+                        let cavityLabel = String.fromCharCode(64 + i);
+                        let row = `
+                            <tr>
+                                <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}"></td>
+                                <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" min="0" value="${input_val}" readonly></td>
+                                <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0" value="${output_val}"></td>
+                                <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" value="${ng_val}" readonly></td>
+                            </tr>
+                        `;
+                        tbody.append(row);
                     }
-                    // else if(category == 'new'){
-                    //     input_val = cavity_count_data.input_quantity;
-                    //     output_val = cavity_count_data.output_quantity;
-                    //     ng_val = cavity_count_data.ng_quantity;
-                    // }
-
-                    let cavityLabel = String.fromCharCode(64 + (i + 1));
-                    let row = `
-                        <tr>
-                            <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}" readonly></td>
-                            <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" min="0" value="${input_val}" readonly></td>
-                            <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0" value="${output_val}" ></td>
-                            <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" value="${ng_val}" readonly></td>
-                        </tr>
-                    `;
-                    tbody.append(row);
+                }else{
+                    $('#CavityCountDiv').addClass('d-none');
                 }
 
                 for(let index = 0; index < mode_of_defect_data.length; index++){
@@ -1583,8 +1593,11 @@ $(document).ready(function(){
 
                 console.log('station', $('#txtSelectRuncardStation option:selected').text());
                 console.log('sub station', $('#txtSelectRuncardSubStation option:selected').text());
+                let stickerCount = parseInt(device_details[0].qty_per_box / device_details[0].qty_per_reel) || 1;
+                if($('#txtSelectRuncardStation option:selected').text() == 'Visual Inspection'
+                    && $('#txtSelectRuncardSubStation option:selected').text() == 'Visual Inspection'
+                    && stickerCount > 1){
 
-                if($('#txtSelectRuncardStation option:selected').text() == 'Visual Inspection' && $('#txtSelectRuncardSubStation option:selected').text() == 'Visual Inspection'){
                     $('#CavityCountDiv').removeClass('d-none');
                 }else{
                     $('#CavityCountDiv').addClass('d-none');
