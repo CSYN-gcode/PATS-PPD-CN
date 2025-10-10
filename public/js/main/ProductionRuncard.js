@@ -1461,9 +1461,9 @@ $(document).ready(function(){
                     for(var i = 1; i <= loop_count; i++){
 
                         if(category == 'edit'){
-                            input_val = cavity_count_data[i].input_quantity;
-                            output_val = cavity_count_data[i].output_quantity;
-                            ng_val = cavity_count_data[i].ng_quantity;
+                            input_val = cavity_count_data[i - 1].input_quantity;
+                            output_val = cavity_count_data[i - 1].output_quantity;
+                            ng_val = cavity_count_data[i - 1].ng_quantity;
                         }
                         // else if(category == 'new'){
                         //     input_val = cavity_count_data.input_quantity;
