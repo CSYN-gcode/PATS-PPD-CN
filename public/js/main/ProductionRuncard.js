@@ -995,7 +995,7 @@ $(document).ready(function(){
                         tbody.append(`
                             <tr>
                                 <td><input type="text" name="cavity[]" class="form-control form-control-sm cls_cavity" value="${cavityLabel}"></td>
-                                <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" value="${inputCavityVal}" readonly></td>
+                                <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" value="${inputCavityVal}"></td>
                                 <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0"></td>
                                 <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" readonly></td>
                             </tr>
@@ -1139,7 +1139,7 @@ $(document).ready(function(){
             });
         }
 
-        if(SaveMode === 'Normal' || (SaveMode === 'WithCavityQty' && totalNgPerCavity == stationNgQuantity)){
+        if(SaveMode === 'Normal' || (SaveMode === 'WithCavityQty' && totalNgPerCavity == 0 ) || (SaveMode === 'WithCavityQty' && totalNgPerCavity == stationNgQuantity)){
             $.ajax({
                 type:"POST",
                 url: "add_runcard_station_data",
@@ -1475,7 +1475,7 @@ $(document).ready(function(){
                         let row = `
                             <tr>
                                 <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}"></td>
-                                <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" min="0" value="${input_val}" readonly></td>
+                                <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" min="0" value="${input_val}"></td>
                                 <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0" value="${output_val}"></td>
                                 <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" value="${ng_val}" readonly></td>
                             </tr>
