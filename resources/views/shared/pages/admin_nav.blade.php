@@ -103,12 +103,32 @@
                         </li>
                     @endif
                     @if ( in_array(Auth::user()->position, [0,1,2,4,5,9,11,12,15,16,17]) ){{-- ISS,PROD - Machine, QC, Technician, Engr Positions --}}
-                        <li class="nav-item has-treeview" id="NavDMRPQC"> <!-- DMR & PQC - TS  -->
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <i class="fa-solid fa-microscope"> </i>
+                                    <p> DMR & PQC </p>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down"> </i>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('dmrpqc_dashboard') }}" class="nav-link">
+                                        <i class="fa-solid fa-square-poll-vertical fa-lg"> </i>
+                                        <p>DASHBOARD</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item has-treeview" id="NavDMRPQC"> <!-- DMR & PQC - TS  -->
+                                    <a href="{{ route('dmrpqc_ts', ['factory' => 'F1']) }}" class="nav-link">
+                                    <i class="fa-solid fa-weight-hanging"></i>
+                                    <p> REQUESTS</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        {{-- <li class="nav-item has-treeview" id="NavDMRPQC"> <!-- DMR & PQC - TS  -->
                             <a href="{{ route('dmrpqc_ts', ['factory' => 'F1']) }}" class="nav-link">
                             <i class="fa-solid fa-weight-hanging"></i>
                             <p> DMR & PQC</p>
                             </a>
-                        </li>
+                        </li> --}}
                     @endif
                     {{-- @if ( in_array(Auth::user()->position, [0,1,2,4,5,9,11,12,15,16,17]) )
                         <li class="nav-item has-treeview" id="NavDMRPQC">

@@ -638,12 +638,12 @@ class DmrpqcTsController extends Controller
         // return $total_pending_requests;
 
         return response()->json([
-            'TotalPendingRequests'       => $TotalPendingRequests,
-            'TotalCompletedRequests'     => $TotalCompletedRequests,
+            'TotalPendingRequests'             => $TotalPendingRequests,
+            'TotalCompletedRequests'           => $TotalCompletedRequests,
             'DmrpqcProductIdentification'      => $PendingProductIdentification,
             'DmrpqcDiesetConditionChecking'    => $PendingDiesetConditionChecking,
             'DmrpqcMachineSetup'               => $PendingMachineSetup,
-            'ProductRequirementChecking' => $PendingProductRequirementChecking,
+            'ProductRequirementChecking'       => $PendingProductRequirementChecking,
             'DmrpqcMachineParameterChecking'   => $PendingMachineParameterChecking,
             'DmrpqcSpecification'              => $PendingSpecification,
             'DmrpqcCompletionActivity'         => $PendingCompletionActivity
@@ -1047,7 +1047,7 @@ class DmrpqcTsController extends Controller
                 if($prod_req_checking_status->status <= 1){//for status 0,1 only
                     $status = $prod_req_checking_status->status + 1;
                 }else{//Update to status 4 to skip ENGR input
-                    $status = $prod_req_checking_status->status + 3;
+                    $status = $prod_req_checking_status->status + 2;
                 }
 
                 switch ($prod_req_checking_status->status){

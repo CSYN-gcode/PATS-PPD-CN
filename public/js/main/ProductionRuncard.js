@@ -1013,10 +1013,14 @@ $(document).ready(function(){
     });
 
     $('#formAddProductionRuncardStation #txtNoCavity').click(function(e){
+        console.log('clicked');
+
         if($(this).prop('checked')){
+            console.log('checked');
             $('#tableCavityCount tbody').find('.cls_cavity').val('N/A');
             $('#tableCavityCount tbody').find('.cls_cavity').prop('readonly', true);
         }else{
+            console.log('unchecked');
             $('#tableCavityCount tbody').find('.cls_cavity').val('');
             $('#tableCavityCount tbody').find('.cls_cavity').prop('readonly', false);
         }
@@ -1443,6 +1447,7 @@ $(document).ready(function(){
                 let input_val = 0;
                 let output_val = 0;
                 let ng_val = 0;
+                let cavityLabel;
 
                 if(response['cav_data_mode'] == 'edit'){
                     loop_count = cavity_count_data.length
@@ -1461,9 +1466,12 @@ $(document).ready(function(){
                     for(var i = 1; i <= loop_count; i++){
 
                         if(category == 'edit'){
+                            cavityLabel = cavity_count_data[i - 1].cavity;
                             input_val = cavity_count_data[i - 1].input_quantity;
                             output_val = cavity_count_data[i - 1].output_quantity;
                             ng_val = cavity_count_data[i - 1].ng_quantity;
+                        }else{
+                            cavityLabel = String.fromCharCode(64 + i);
                         }
                         // else if(category == 'new'){
                         //     input_val = cavity_count_data.input_quantity;
@@ -1471,10 +1479,10 @@ $(document).ready(function(){
                         //     ng_val = cavity_count_data.ng_quantity;
                         // }
 
-                        let cavityLabel = String.fromCharCode(64 + i);
+
                         let row = `
                             <tr>
-                                <td><input type="text" name="cavity[]" class="form-control form-control-sm" value="${cavityLabel}"></td>
+                                <td><input type="text" name="cavity[]" class="form-control form-control-sm cls_cavity" value="${cavityLabel}"></td>
                                 <td><input type="number" name="input_cav[]" class="form-control form-control-sm cls_input" min="0" value="${input_val}"></td>
                                 <td><input type="number" name="output_cav[]" class="form-control form-control-sm cls_output" min="0" value="${output_val}"></td>
                                 <td><input type="number" name="ng_cav[]" class="form-control form-control-sm cls_ng" min="0" value="${ng_val}" readonly></td>

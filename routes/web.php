@@ -76,6 +76,7 @@ Route::controller(DefectsInfoController::class)->group(function () {
 
 /* DMRPQC INFO */
 Route::view('/dmrpqc_ts','dmrpqc_ts')->name('dmrpqc_ts');
+Route::view('/dmrpqc_dashboard','dmrpqc_dashboard')->name('dmrpqc_dashboard');
 // Route::view('/dmrpqc_f3','dmrpqc_f3')->name('dmrpqc_f3');
 
 // Route::get('/dmrpqc_ts/{factory}', function ($factory) {
