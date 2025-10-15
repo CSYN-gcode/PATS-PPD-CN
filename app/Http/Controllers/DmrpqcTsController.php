@@ -35,7 +35,7 @@ class DmrpqcTsController extends Controller
             ->where('logdel', 0);
 
         // Optional status filter
-        if($request->has('mode') && $request->mode == 'OQC') {
+        if($request->has('mode') && $request->mode == 'OQC'){
             $query->where('status', 3)->where('process_status', 9);
         }
 

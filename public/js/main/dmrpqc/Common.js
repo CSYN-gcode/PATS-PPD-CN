@@ -456,7 +456,7 @@ const GetDmrpqcDetails = (data, attr_mode = null) => {
                 $("#frm_txt_requested_by_id").val(dmrpqc_details[0].created_by.id);
                 $("#frm_txt_requested_by").val(dmrpqc_details[0].created_by.full_name);
 
-                // GetPPSDBDataByItemCode(dmrpqc_details[0].po_number);
+                GetPPSDBDataByItemCode(dmrpqc_details[0].po_number);
 
                     if(dieset_condition_details != ''){
                         if(dieset_condition_details[0].parts_drawing != undefined){

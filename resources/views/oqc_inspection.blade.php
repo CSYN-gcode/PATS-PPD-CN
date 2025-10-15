@@ -688,21 +688,19 @@
                                     alert("Something went wrong: " + error);
                                     return;
                                 }
-                                // console.log('testval', result.dmrpqc_device_info.length);
-                                
-                                // Example validation
-                                if(result.dmrpqc_device_info){
+
+                                // if(result.dmrpqc_device_info){ //clark comment for now due to issues in DMRPQC
                                         getPoNo =  po.po_number
                                         $('#txtPoNumber').val(po.po_number)
                                         $('#txtMaterialName').val(po.part_name)
                                         $('#txtPoQuantity').val(po.po_quantity)
                                         $("#txtOQCProdLotNo").val(po.production_lot)
                                         $('#mdlScanQrCode').modal('hide')
-                                }else{
-                                    alert("Device has no completed DMR & PQC data, Please complete to DMR & PQC first");
-                                }
+                                // }else{ //clark comment for now due to issues in DMRPQC
+                                //     alert("Device has no completed DMR & PQC data, Please complete to DMR & PQC first");
+                                // }
                             });
-                            
+
                         }catch (error) {
                             alert('The Scan QR Code was not found!')
                             $('.invalidScan').val('')

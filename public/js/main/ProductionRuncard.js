@@ -251,7 +251,7 @@ $(document).ready(function(){
                 }
                 cboElement.html(result);
                 if(PoNumber != null){
-                    cboElement.val(PoNumber).trigger('change');
+                    cboElement.val(PoNumber).trigger('change', ['edit']);
                     // GetPPSDBDataByPO(PoNumber, device_name, 1);
                 }
             },
@@ -400,6 +400,18 @@ $(document).ready(function(){
                 GetPOFromPPSDB($('#txtPONumber'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].po_number);
                 GetMachineNo($('.SelMachineNo'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].machine_no);
 
+                // console.log('production lot lenght',prod_runcard_data[0].production_lot.length);
+                if(prod_runcard_data[0].production_lot.length >= 17){
+                    production_lot_time = prod_runcard_data[0].production_lot.substr(-9);
+                }else{
+                    production_lot_time = prod_runcard_data[0].production_lot.substr(-4);
+                }
+
+                $('#formProductionRuncard #txtProductionLotTime').val(production_lot_time);
+                console.log('prodlottime', $('#formProductionRuncard #txtProductionLotTime').val());
+
+                $('#formProductionRuncard #txtShipmentOutput').val(prod_runcard_data[0].shipment_output);
+
                 $('#formProductionRuncard #txtPOQty').val(prod_runcard_data[0].po_quantity);
                 // $('#formProductionRuncard #txtRequiredOutput').val(prod_runcard_data[0].required_qty);
                 $('#formProductionRuncard #txtRequiredOutput').val($('#txtSearchReqOutput').val());
@@ -453,19 +465,32 @@ $(document).ready(function(){
         // console.log('change po click true');
     // $("#formProductionRuncard #txtPONumber").focus(function(){
         // console.log('focus true');
-        $('#formProductionRuncard #txtPONumber').change(delay(function(e){
+        $('#formProductionRuncard #txtPONumber').change(delay(function(e, triggerMode){
                 // console.log('change po test true');
+            console.log('nag run dito 1');
+            let mode = 'new'; // default
+            mode = triggerMode || 'new';
+
+            if (mode === 'new') {
+                console.log('User selected manually → NEW mode');
+                // Your logic for new mode
+            } else if (mode === 'edit') {
+                console.log('Triggered via AJAX → EDIT mode');
+                // Your logic for edit mode
+            }
+
             let po_number = $(this).val();
             let device_name = $('#formProductionRuncard').find('#txtPartName').val();
             // let current_value = '0';
             if(po_number != ''){
-                GetPPSDBDataByPO(po_number, device_name);
+                GetPPSDBDataByPO(po_number, device_name, mode);
+                $("#formProductionRuncard #txtNewlyMaintenance").prop('disabled', false);
             }
         }, 300));
     // });
     // });
 
-    function GetPPSDBDataByPO(po_number, device_name){
+    function GetPPSDBDataByPO(po_number, device_name, mode){
         $.ajax({
             url: "search_po_from_ppsdb",
             method: "get",
@@ -555,7 +580,9 @@ $(document).ready(function(){
                 }
 
                 prod_lot = rev_no + year + month + date + maintenance + production_lot_time;
-                $("#formProductionRuncard #txtProductionLot").val(prod_lot);
+                if(mode === 'new'){
+                    $("#formProductionRuncard #txtProductionLot").val(prod_lot);
+                }
             }
         });
     }
@@ -849,6 +876,8 @@ $(document).ready(function(){
                 }
 
                 $('#formProductionRuncard #txtProductionLotTime').val(production_lot_time);
+
+                $('#formProductionRuncard #txtShipmentOutput').val(prod_runcard_data[0].shipment_output);
 
                 $('#formProductionRuncard #txtProductionLot').val(prod_runcard_data[0].production_lot);
                 $('#formProductionRuncard #txtDrawingNo').val(prod_runcard_data[0].drawing_no);
@@ -1387,7 +1416,7 @@ $(document).ready(function(){
                 $('#formAddProductionRuncardStation #txtStep').val(station_data.station_step);
                 $('#formAddProductionRuncardStation #txtSubStationStep').val(station_data.sub_station_step);
 
-                $('#formAddProductionRuncardStation #txtShipmentOutput').val(station_data.shipment_output);
+                $('#formProductionRuncard #txtShipmentOutput').val(station_data.shipment_output);
 
                 $('#formAddProductionRuncardStation #txtRemarks').val(station_data.station_remarks);
                 // $('#formAddProductionRuncardStation #txtMachineNo').val(station_data.station_plastic_injection_machine_no);
