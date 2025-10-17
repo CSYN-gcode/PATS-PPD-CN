@@ -278,11 +278,11 @@
                       <option value="11">Technician/Die Maintenance Engr</option>
                       <option value="12">Prod - Machine Operator</option>
                       <option value="13">Prod - Visual Inspection</option>
-                      <option value="13">Prod - Finishing</option>
-                      <option value="14">Process Engineer</option>
-                      <option value="15">Engineering Supervisor</option>
-                      <option value="16">PPD Manager</option>
-                      <option value="17">Packing Operator</option>
+                      <option value="14">Prod - Finishing</option>
+                      <option value="15">Process Engineer</option>
+                      <option value="16">Engineering Supervisor</option>
+                      <option value="17">PPD Manager</option>
+                      <option value="18">Packing Operator</option>
                       {{-- <option value="12">IPQC Inspector</option>
                       <option value="13">OQC Inspector</option> --}}
                     </select>
@@ -543,10 +543,11 @@
                       <option value="11">Technician/Die Maintenance Engr</option>
                       <option value="12">Prod - Machine Operator</option>
                       <option value="13">Prod - Visual Inspection</option>
-                      <option value="13">Prod - Finishing</option>
-                      <option value="14">Process Engineer</option>
-                      <option value="15">Engineering Supervisor</option>
-                      <option value="16">PPD Manager</option>
+                      <option value="14">Prod - Finishing</option>
+                      <option value="15">Process Engineer</option>
+                      <option value="16">Engineering Supervisor</option>
+                      <option value="17">PPD Manager</option>
+                      <option value="18">Packing Operator</option>
                     </select>
                 </div>
 
@@ -627,7 +628,7 @@
             url: "view_users",
             // data: function (param){
             //     param.status = $("#selEmpStat").val();
-            // }    
+            // }
           },
 
           "columns":[
@@ -670,57 +671,42 @@
                   display: function (data, type, row) {
                     if (row.position == 0) {
                       return "N/A";
-                    }
-                    else if (row.position == 1) {
+                    }else if (row.position == 1) {
                       return "Prod'n Supervisor";
-                    }
-                    else if (row.position == 2) {
+                    }else if (row.position == 2) {
                       return "QC Supervisor";
-                    }
-                    else if (row.position == 3) {
+                    }else if (row.position == 3) {
                       return "Material Handler";
-                    }
-                    else if (row.position == 4) {
+                    }else if (row.position == 4) {
                       return "Production Operator";
-                    }
-                    else if (row.position == 5) {
+                    }else if (row.position == 5) {
                       return "QC Inspector";
-                    }
-                    else if (row.position == 6) {
+                    }else if (row.position == 6) {
                       return "Warehouse";
-                    }
-                    else if (row.position == 7) {
+                    }else if (row.position == 7) {
                       return "PPC - Planner";
-                    }
-                    else if (row.position == 8) {
+                    }else if (row.position == 8) {
                       return "PPC - Sr. Planner";
-                    }
-                    else if (row.position == 9) {
+                    }else if (row.position == 9) {
                       return "Engineer";
-                    }
-                    else if (row.position == 10) {
+                    }else if (row.position == 10) {
                       return "PPC - Clerk";
-                    }
-                    else if (row.position == 11) {
+                    }else if (row.position == 11){
                       return "Technician/Die Maintenance Engr";
-                    }
-                    else if (row.position == 12) {
+                    }else if (row.position == 12){
                       return "Prod - Machine Operator";
-                    }
-                    else if (row.position == 13) {
+                    }else if (row.position == 13) {
                       return "Prod - Visual Inspection";
-                    }
-                    else if (row.position == 14) {
+                    }else if (row.position == 14) {
                       return "Prod - Finishing";
-                    }
-                    else if (row.position == 15) {
+                    }else if (row.position == 15) {
                       return "Process Engineer";
-                    }
-                    else if (row.position == 16) {
+                    }else if (row.position == 16) {
                       return "Engineering Supervisor";
-                    }
-                    else if (row.position == 17) {
+                    }else if (row.position == 17) {
                       return "PPD Manager";
+                    }else if (row.position == 18) {
+                      return "Packing Operator";
                     }
                   },
                 },

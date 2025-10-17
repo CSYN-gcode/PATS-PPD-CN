@@ -1990,7 +1990,7 @@
                                                                             {{-- OGAB --}}
                                                                             <td colspan="2">
                                                                                 <div class="input-group input-group-sm">
-                                                                                    <select class="form-control select2bs5 prod_req_checking_data text-center" id="selEngrVisualUser" name="process_engr_visual_insp_name" style="width: 100%;">
+                                                                                    <select class="form-control prod_req_checking_data text-center" id="selEngrVisualUser" name="process_engr_visual_insp_name" style="width: 100%;">
                                                                                         <option disabled selected>-- Process Engr --</option>
                                                                                         {{-- <option value="">-- N/A --</option> --}}
                                                                                     </select>
@@ -2013,7 +2013,7 @@
                                                                             <td colspan="2" class="text-center">
                                                                                 {{-- <input type="text" class="form-control prod_req_checking_data" name="check_point_7" id="frm_check_point_7"> --}}
                                                                                 <div class="input-group input-group-sm">
-                                                                                    <select class="form-control select2bs5 prod_req_checking_data text-center" id="selEngrDimensionUser" name="process_engr_dimension_insp_name" style="width: 100%;">
+                                                                                    <select class="form-control prod_req_checking_data text-center" id="selEngrDimensionUser" name="process_engr_dimension_insp_name" style="width: 100%;">
                                                                                         <option disabled selected>-- Process Engr --</option>
                                                                                         {{-- <option value="">-- N/A --</option> --}}
                                                                                     </select>

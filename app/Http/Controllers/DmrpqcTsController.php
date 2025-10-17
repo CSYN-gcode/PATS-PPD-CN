@@ -56,9 +56,11 @@ class DmrpqcTsController extends Controller
         date_default_timezone_set('Asia/Manila');
         $monthNow = Carbon::now()->format('m');
 
-        $user_details = User::where('id', Auth::user()->id)->first();
+        $position = Auth::user()->position;
         // return $user_details;
-        $position = $user_details->position;
+        // $user_details = User::where('id', Auth::user()->id)->first();
+        // // return $user_details;
+        // $position = $user_details->position;
 
         // return $position;
         if($position == 0 || $position == 17){ //ADMIN
@@ -67,15 +69,15 @@ class DmrpqcTsController extends Controller
             $mach_param_stat_by_pos = [0,1,2];
         }else if($position == 1 || $position == 4 || $position == 12 || $position == 13 || $position == 14 || $position == 17){ //PRODUCTION
             $process_status_by_position = [1,4,5,8,9];
-            $prod_req_checking_stat_by_pos = [0];
+            $prod_req_checking_stat_by_pos = [0]; //have access to production req checking 1.0 (Prod) part
             $mach_param_stat_by_pos = [];
         }else if($position == 2 || $position == 5){ //QC
             $process_status_by_position = [5,6,7,9];
-            $prod_req_checking_stat_by_pos = [2];
+            $prod_req_checking_stat_by_pos = [2]; //have access to production req checking 3.0 (QC) part
             $mach_param_stat_by_pos = [2];
         }else if($position == 9 || $position == 11 || $position == 15 || $position == 16 || $position == 17){ //ENGR
             $process_status_by_position = [2,3,4,5,6,7,8,9];
-            $prod_req_checking_stat_by_pos = [1,3,4];
+            $prod_req_checking_stat_by_pos = [1,3,4]; //have access to production req checking 2.0 (TECH), 4.0 (Tech) part
             $mach_param_stat_by_pos = [0,1];
         }else{
             $process_status_by_position = [1,2,3,4,5,6,7,8,9];
@@ -166,6 +168,7 @@ class DmrpqcTsController extends Controller
                         // return $dmrpqc_details[3]->user_level_id;
                         // return $dmrpqc_details[0]->mach_param_chckng;
         // return $dmrpqc_details;
+        // return $dmrpqc_details->prod_req_checking_id;
         return DataTables::of($dmrpqc_details)
             ->addColumn('action', function ($dmrpqc_details) use ($prod_req_checking_stat_by_pos, $process_status_by_position, $mach_param_stat_by_pos){
 
@@ -258,6 +261,7 @@ class DmrpqcTsController extends Controller
                         }else if($dmrpqc_details->status == 2 && $dmrpqc_details->process_status == 5){ //Ongoing in Part 5
                             if(in_array(5, $process_status_by_position)){
                                 // $result .= $action_btn_update;
+                                // PRODUCTION ACCESS
                                 if(in_array(0, $prod_req_checking_stat_by_pos) && $dmrpqc_details->prod_req_checking_status == 0){
                                     $result .= $action_btn_update;
                                     // if(DmrpqcProductReqChecking::where('status', 0)->where('logdel', 0)->exists()){
@@ -267,6 +271,7 @@ class DmrpqcTsController extends Controller
                                     // }
                                 }
 
+                                // TECHNICIAN ACCESS
                                 if(in_array(1, $prod_req_checking_stat_by_pos) && $dmrpqc_details->prod_req_checking_status == 1){
                                     $result .= $action_btn_update;
                                     // if(DmrpqcProductReqChecking::where('status', 1)->where('logdel', 0)->exists()){
@@ -275,32 +280,54 @@ class DmrpqcTsController extends Controller
                                     //     break;
                                     // }
                                 }
-                                if(in_array(2, $prod_req_checking_stat_by_pos) && $dmrpqc_details->prod_req_checking_status == 2){
+
+                                // QC ACCESS
+                                if(in_array(2, $prod_req_checking_stat_by_pos) && ($dmrpqc_details->prod_req_checking_status == 2 || $dmrpqc_details->prod_req_checking_status == 4)){
                                     $result .= $action_btn_update;
+                                    $update_btn = 'true';
+
+                                    // Enable Submit button for QC when the Product Req Checking is complete & skipped the 4.0 Process Engr part
+                                    if(DmrpqcProductReqChecking::where('id', $dmrpqc_details->prod_req_checking_id)->where('status', 4)->where('logdel', 0)->exists()){
+                                        $result .= $action_btn_submit;
+                                        $submit_btn = 'true';
+                                    }else{
+                                        $submit_btn = 'false';
+                                    }
+                                    // $result .= $action_btn_submit;
                                     // if(DmrpqcProductReqChecking::where('status', 2)->where('logdel', 0)->exists()){
                                     //     $result .= $action_btn_view;
                                     //     $result .= $action_btn_submit;
                                     //     break;
                                     // }
+                                }else{
+                                    $update_btn = 'false';
+                                    $submit_btn = 'false';
                                 }
+
+                                // ENGR ACCESS
+                                // if(in_array(3, $prod_req_checking_stat_by_pos) && ($dmrpqc_details->prod_req_checking_status == 3 || $dmrpqc_details->prod_req_checking_status == 4)){
+                                //     $result .= $action_btn_update;
+                                //     // if(DmrpqcProductReqChecking::where('status', 3)->where('logdel', 0)->exists()){
+                                //     //     $result .= $action_btn_view;
+                                //     //     $result .= $action_btn_submit;
+                                //     //     break;
+                                //     // }
+                                // }
+                                // ENGR ACCESS
                                 if(in_array(3, $prod_req_checking_stat_by_pos) && $dmrpqc_details->prod_req_checking_status == 3){
-                                    $result .= $action_btn_update;
-                                    // if(DmrpqcProductReqChecking::where('status', 3)->where('logdel', 0)->exists()){
-                                    //     $result .= $action_btn_view;
-                                    //     $result .= $action_btn_submit;
-                                    //     break;
-                                    // }
-                                }
-                                if(in_array(4, $prod_req_checking_stat_by_pos) && $dmrpqc_details->prod_req_checking_status == 4){
-                                    $result .= $action_btn_update;
-                                    if(DmrpqcProductReqChecking::where('status', 4)->where('logdel', 0)->exists()){
+                                    if($update_btn == 'false'){
+                                        $result .= $action_btn_update;
+                                    }
+
+                                    // where('id', $dmrpqc_details->prod_req_checking_id)->
+                                    if(DmrpqcProductReqChecking::where('id', $dmrpqc_details->prod_req_checking_id)->where('status', 4)->where('logdel', 0)->exists()){
                                         $result .= $action_btn_view;
-                                        $result .= $action_btn_submit;
-                                        // break;
+                                        if($submit_btn == 'false'){
+                                            $result .= $action_btn_submit;
+                                        }
                                     }
                                 }else{
                                     $result .= $action_btn_view;
-                                    // break;
                                 }
                             }else{
                                 $result .= $action_btn_view;
@@ -501,20 +528,23 @@ class DmrpqcTsController extends Controller
                                     break;
                                 case 5: //Production/Process Engr.
                                     switch ($dmrpqc_details->prod_req_checking_status){
-                                        case 0:
+                                        case 0: //PROD
                                             $result .= '<span class="badge badge-pill badge-primary">Production/Process/Die Maintenance Engr./QC</span></center>';
                                             break;
-                                        case 1:
-                                            $result .= '<span class="badge badge-pill badge-primary">Production</span></center>';
-                                            break;
-                                        case 2:
+                                        case 1: //TECH
                                             $result .= '<span class="badge badge-pill badge-primary">Engineering</span></center>';
                                             break;
-                                        case 3:
+                                        case 2: //QC
                                             $result .= '<span class="badge badge-pill badge-primary">Line Quality Control</span></center>';
                                             break;
+                                        // case 3:
+                                        //     $result .= '<span class="badge badge-pill badge-primary">Line Quality Control</span></center>';
+                                        //     break;
+                                        case 3: //4
+                                            $result .= '<span class="badge badge-pill badge-primary">Process Engineering</span></center>';
+                                            break;
                                         case 4:
-                                            if($dmrpqc_details->max_process_category == 3){
+                                            if($dmrpqc_details->max_process_category == 2){
                                                 $result .= '<span class="badge badge-pill badge-primary">Line Quality Control</span></center>';
                                             }else{
                                                 $result .= '<span class="badge badge-pill badge-primary">Process Engineering</span></center>';
@@ -1042,13 +1072,22 @@ class DmrpqcTsController extends Controller
         DB::beginTransaction();
         try{
             if(isset(Auth::user()->id)){
-                $prod_req_checking_status = DmrpqcProductReqChecking::select('id','status')->where('request_id', $request->request_id)->first();
-
-                if($prod_req_checking_status->status <= 1){//for status 0,1 only
+                $prod_req_checking_status = DmrpqcProductReqChecking::with(['prod_req_checking_details'])->where('request_id', $request->request_id)->first();
+                //  return $prod_req_checking_status;
+                //  if($prod_req_checking_status->prod_req_checking_details->isEmpty()){
+                //     return 'true';
+                //  }else{
+                //     return 'false';
+                //  }
+                if($prod_req_checking_status->status <= 1 || $prod_req_checking_status->status == 3 || ($request->lqc_visual_insp_result == 0 || $request->lqc_dimension_insp_result == 0)){//for status 0,1 only
                     $status = $prod_req_checking_status->status + 1;
                 }else{//Update to status 4 to skip ENGR input
+                // else if($prod_req_checking_status->status == 2 && ($request->lqc_visual_insp_result == 1 || $request->lqc_dimension_insp_result == 1))
                     $status = $prod_req_checking_status->status + 2;
                 }
+                // else{
+                //     $status = $prod_req_checking_status->status + 1;
+                // }
 
                 switch ($prod_req_checking_status->status){
                     case 0:
@@ -1090,30 +1129,43 @@ class DmrpqcTsController extends Controller
                         ]);
 
                     if($prod_req_checking_status->status == 0){ //PRODUCTION
-                        DmrpqcProductReqCheckingDetails::insert([
-                            'prod_req_checking_id' => $prod_req_checking_status->id,
-                            'process_category' => ($prod_req_checking_status->status + 1),
-                            'eval_sample' => $request->prod_eval_sample,
-                            'japan_sample' => $request->prod_japan_sample,
-                            'last_prodn_sample' => $request->prod_last_prodn_sample,
-                            'dieset_eval_report' => $request->prod_dieset_eval_report,
-                            'cosmetic_defect' => $request->prod_cosmetic_defect,
-                            'pingauges' => $request->prod_pingauges,
-                            'measurescope' => $request->prod_measurescope,
-                            'n_a' => $request->prod_na,
-                            'visual_insp_name' => $request->prod_visual_insp_name,
-                            'visual_insp_datetime' => date('Y-m-d H:i:s'),
-                            'visual_insp_result' => $request->prod_visual_insp_result,
-                            'dimension_insp_name' => $request->prod_dimension_insp_name,
-                            'dimension_insp_datetime' => date('Y-m-d H:i:s'),
-                            'dimension_insp_result' => $request->prod_dimension_insp_result,
-                            'actual_checking_remarks' => $request->prod_actual_checking_remarks,
-                            // 'status' => 1, //Change Status to Updated(1)
-                            'created_by' => $request->user_id,
-                            'last_updated_by' => $request->user_id,
-                            'created_at' => date('Y-m-d H:i:s'),
-                            'updated_at' => date('Y-m-d H:i:s'),
-                        ]);
+                        $data_arr = ['prod_req_checking_id' => $prod_req_checking_status->id,
+                                    'process_category' => $prod_req_checking_status->status,
+                                    'eval_sample' => $request->prod_eval_sample,
+                                    'japan_sample' => $request->prod_japan_sample,
+                                    'last_prodn_sample' => $request->prod_last_prodn_sample,
+                                    'dieset_eval_report' => $request->prod_dieset_eval_report,
+                                    'cosmetic_defect' => $request->prod_cosmetic_defect,
+                                    'pingauges' => $request->prod_pingauges,
+                                    'measurescope' => $request->prod_measurescope,
+                                    'n_a' => $request->prod_na,
+                                    'visual_insp_name' => $request->prod_visual_insp_name,
+                                    'visual_insp_datetime' => date('Y-m-d H:i:s'),
+                                    'visual_insp_result' => $request->prod_visual_insp_result,
+                                    'dimension_insp_name' => $request->prod_dimension_insp_name,
+                                    'dimension_insp_datetime' => date('Y-m-d H:i:s'),
+                                    'dimension_insp_result' => $request->prod_dimension_insp_result,
+                                    'actual_checking_remarks' => $request->prod_actual_checking_remarks,
+                                    // 'status' => 1, //Change Status to Updated(1)
+                                    'created_by' => $request->user_id,
+                                    'last_updated_by' => $request->user_id,
+                                    'created_at' => date('Y-m-d H:i:s'),
+                                    'updated_at' => date('Y-m-d H:i:s')
+                        ];
+
+                        if($prod_req_checking_status->prod_req_checking_details->isNotEmpty()){
+                            $match = collect($prod_req_checking_status->prod_req_checking_details)
+                                        ->first(function ($item){
+                                            return $item->process_category == 0 && $item->logdel == 0;
+                                        });
+                            if($match){
+                                DmrpqcProductReqCheckingDetails::where('id', $match->id)->update($data_arr);
+                            }else{
+                                DmrpqcProductReqCheckingDetails::insert($data_arr);
+                            }
+                        }else{
+                            DmrpqcProductReqCheckingDetails::insert($data_arr);
+                        }
 
                         DmrpqcMachineSetupSample::where('request_id', $request->request_id)
                         ->update([
@@ -1128,9 +1180,10 @@ class DmrpqcTsController extends Controller
                             // 'status' => 1 //Change Status to Updated(1)
                         ]);
                     }else if($prod_req_checking_status->status == 1){ //TECHNICIAN
-                        DmrpqcProductReqCheckingDetails::insert([
+
+                        $data_arr = [
                             'prod_req_checking_id' => $prod_req_checking_status->id,
-                            'process_category' => ($prod_req_checking_status->status + 1),
+                            'process_category' => $prod_req_checking_status->status,
                             'eval_sample' => $request->engr_tech_eval_sample,
                             'japan_sample' => $request->engr_tech_japan_sample,
                             'last_prodn_sample' => $request->engr_tech_last_prodn_sample,
@@ -1155,8 +1208,53 @@ class DmrpqcTsController extends Controller
                             'created_by' => $request->user_id,
                             'last_updated_by' => $request->user_id,
                             'created_at' => date('Y-m-d H:i:s'),
-                            'updated_at' => date('Y-m-d H:i:s'),
-                        ]);
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ];
+
+                        if($prod_req_checking_status->prod_req_checking_details->isNotEmpty()){
+                            $match = collect($prod_req_checking_status->prod_req_checking_details)
+                                            ->first(function ($item){
+                                                return $item->process_category == 1 && $item->logdel == 0;
+                                            });
+
+                            // return $match;
+                            if($match){
+                                DmrpqcProductReqCheckingDetails::where('id', $match->id)->update($data_arr);
+                            }else{
+                                DmrpqcProductReqCheckingDetails::insert($data_arr);
+                            }
+                        }else{
+                            DmrpqcProductReqCheckingDetails::insert($data_arr);
+                        }
+                        // DmrpqcProductReqCheckingDetails::insert([
+                        //     'prod_req_checking_id' => $prod_req_checking_status->id,
+                        //     'process_category' => $prod_req_checking_status->status,
+                        //     'eval_sample' => $request->engr_tech_eval_sample,
+                        //     'japan_sample' => $request->engr_tech_japan_sample,
+                        //     'last_prodn_sample' => $request->engr_tech_last_prodn_sample,
+                        //     'material_drawing' => $request->engr_tech_material_drawing,
+                        //     'material_drawing_no' => $request->engr_tech_material_drawing_no,
+                        //     'material_rev_no' => $request->engr_tech_material_rev_no,
+                        //     'insp_guide' => $request->engr_tech_insp_guide,
+                        //     'insp_guide_drawing_no' => $request->engr_tech_insp_guide_drawing_no,
+                        //     'insp_guide_rev_no' => $request->engr_tech_insp_guide_rev_no,
+                        //     'dieset_eval_report' => $request->engr_tech_dieset_eval_report,
+                        //     'cosmetic_defect' => $request->engr_tech_cosmetic_defect,
+                        //     'pingauges' => $request->engr_tech_pingauges,
+                        //     'measurescope' => $request->engr_tech_measurescope,
+                        //     'n_a' => $request->engr_tech_na,
+                        //     'visual_insp_name' => $request->engr_tech_visual_insp_name,
+                        //     'visual_insp_datetime' => date('Y-m-d H:i:s'),
+                        //     'visual_insp_result' => $request->engr_tech_visual_insp_result,
+                        //     'dimension_insp_name' => $request->engr_tech_dimension_insp_name,
+                        //     'dimension_insp_datetime' => date('Y-m-d H:i:s'),
+                        //     'dimension_insp_result' => $request->engr_tech_dimension_insp_result,
+                        //     'actual_checking_remarks' => $request->engr_tech_actual_checking_remarks,
+                        //     'created_by' => $request->user_id,
+                        //     'last_updated_by' => $request->user_id,
+                        //     'created_at' => date('Y-m-d H:i:s'),
+                        //     'updated_at' => date('Y-m-d H:i:s'),
+                        // ]);
 
                         DmrpqcMachineSetupSample::where('request_id', $request->request_id)
                         ->update([
@@ -1165,9 +1263,9 @@ class DmrpqcTsController extends Controller
                             // 'status' => 1 //Change Status to Updated(1)
                         ]);
                     }else if($prod_req_checking_status->status == 2){ //LQC
-                        DmrpqcProductReqCheckingDetails::insert([
+                        $data_arr = [
                             'prod_req_checking_id' => $prod_req_checking_status->id,
-                            'process_category' => ($prod_req_checking_status->status + 1),
+                            'process_category' => $prod_req_checking_status->status,
                             'eval_sample' => $request->lqc_eval_sample,
                             'japan_sample' => $request->lqc_japan_sample,
                             'last_prodn_sample' => $request->lqc_last_prodn_sample,
@@ -1194,7 +1292,53 @@ class DmrpqcTsController extends Controller
                             'created_at' => date('Y-m-d H:i:s'),
                             'updated_at' => date('Y-m-d H:i:s'),
                             // 'status' => 3 //Change Status to Updated(1)
-                        ]);
+                        ];
+
+                        if($prod_req_checking_status->prod_req_checking_details->isNotEmpty()){
+                            $match = collect($prod_req_checking_status->prod_req_checking_details)
+                                            ->first(function ($item){
+                                                return $item->process_category == 2 && $item->logdel == 0;
+                                            });
+
+                            if($match){
+                                DmrpqcProductReqCheckingDetails::where('id', $match->id)->update($data_arr);
+                            }else{
+                                DmrpqcProductReqCheckingDetails::insert($data_arr);
+                            }
+                        }else{
+                            DmrpqcProductReqCheckingDetails::insert($data_arr);
+                        }
+
+                        // DmrpqcProductReqCheckingDetails::insert([
+                        //     'prod_req_checking_id' => $prod_req_checking_status->id,
+                        //     'process_category' => $prod_req_checking_status->status,
+                        //     'eval_sample' => $request->lqc_eval_sample,
+                        //     'japan_sample' => $request->lqc_japan_sample,
+                        //     'last_prodn_sample' => $request->lqc_last_prodn_sample,
+                        //     'material_drawing' => $request->lqc_material_drawing,
+                        //     'material_drawing_no' => $request->lqc_material_drawing_no,
+                        //     'material_rev_no' => $request->lqc_material_rev_no,
+                        //     'insp_guide' => $request->lqc_insp_guide,
+                        //     'insp_guide_drawing_no' => $request->lqc_insp_guide_drawing_no,
+                        //     'insp_guide_rev_no' => $request->lqc_insp_guide_rev_no,
+                        //     'dieset_eval_report' => $request->lqc_dieset_eval_report,
+                        //     'cosmetic_defect' => $request->lqc_cosmetic_defect,
+                        //     'pingauges' => $request->lqc_pingauges,
+                        //     'measurescope' => $request->lqc_measurescope,
+                        //     'n_a' => $request->lqc_na,
+                        //     'visual_insp_name' => $request->lqc_visual_insp_name,
+                        //     'visual_insp_datetime' => date('Y-m-d H:i:s'),
+                        //     'visual_insp_result' => $request->lqc_visual_insp_result,
+                        //     'dimension_insp_name' => $request->lqc_dimension_insp_name,
+                        //     'dimension_insp_datetime' => date('Y-m-d H:i:s'),
+                        //     'dimension_insp_result' => $request->lqc_dimension_insp_result,
+                        //     'actual_checking_remarks' => $request->lqc_actual_checking_remarks,
+                        //     'created_by' => $request->user_id,
+                        //     'last_updated_by' => $request->user_id,
+                        //     'created_at' => date('Y-m-d H:i:s'),
+                        //     'updated_at' => date('Y-m-d H:i:s'),
+                        //     // 'status' => 3 //Change Status to Updated(1)
+                        // ]);
 
                         DmrpqcMachineSetupSample::where('request_id', $request->request_id)
                         ->update([
@@ -1203,9 +1347,9 @@ class DmrpqcTsController extends Controller
                             // 'status' => 1 //Change Status to Updated(1)
                         ]);
                     }else if($prod_req_checking_status->status == 3){ //ENGR
-                        DmrpqcProductReqCheckingDetails::insert([
+                        $data_arr = [
                             'prod_req_checking_id' => $prod_req_checking_status->id,
-                            'process_category' => ($prod_req_checking_status->prod_req_checking_status + 1),
+                            'process_category' => $prod_req_checking_status->status,
                             'eval_sample' => $request->process_engr_eval_sample,
                             'japan_sample' => $request->process_engr_japan_sample,
                             'last_prodn_sample' => $request->process_engr_last_prodn_sample,
@@ -1232,7 +1376,52 @@ class DmrpqcTsController extends Controller
                             'created_at' => date('Y-m-d H:i:s'),
                             'updated_at' => date('Y-m-d H:i:s'),
                             // 'status' => 4 //Change Status to Updated(1)
-                        ]);
+                        ];
+
+                        if($prod_req_checking_status->prod_req_checking_details->isNotEmpty()){
+                            $match = collect($prod_req_checking_status->prod_req_checking_details)
+                                            ->first(function ($item){
+                                                return $item->process_category == 3 && $item->logdel == 0;
+                                            });
+                            if($match){
+                                DmrpqcProductReqCheckingDetails::where('id', $match->id)->update($data_arr);
+                            }else{
+                                DmrpqcProductReqCheckingDetails::insert($data_arr);
+                            }
+                        }else{
+                            DmrpqcProductReqCheckingDetails::insert($data_arr);
+                        }
+
+                        // DmrpqcProductReqCheckingDetails::insert([
+                        //     'prod_req_checking_id' => $prod_req_checking_status->id,
+                        //     'process_category' => $prod_req_checking_status->status,
+                        //     'eval_sample' => $request->process_engr_eval_sample,
+                        //     'japan_sample' => $request->process_engr_japan_sample,
+                        //     'last_prodn_sample' => $request->process_engr_last_prodn_sample,
+                        //     'material_drawing' => $request->process_engr_material_drawing,
+                        //     'material_drawing_no' => $request->process_engr_material_drawing_no,
+                        //     'material_rev_no' => $request->process_engr_material_rev_no,
+                        //     'insp_guide' => $request->process_engr_insp_guide,
+                        //     'insp_guide_drawing_no' => $request->process_engr_insp_guide_drawing_no,
+                        //     'insp_guide_rev_no' => $request->process_engr_insp_guide_rev_no,
+                        //     'dieset_eval_report' => $request->process_engr_dieset_eval_report,
+                        //     'cosmetic_defect' => $request->process_engr_cosmetic_defect,
+                        //     'pingauges' => $request->process_engr_pingauges,
+                        //     'measurescope' => $request->process_engr_measurescope,
+                        //     'n_a' => $request->process_engr_na,
+                        //     'visual_insp_name' => $request->process_engr_visual_insp_name,
+                        //     'visual_insp_datetime' => date('Y-m-d H:i:s'),
+                        //     'visual_insp_result' => $request->process_engr_visual_insp_result,
+                        //     'dimension_insp_name' => $request->process_engr_dimension_insp_name,
+                        //     'dimension_insp_datetime' => date('Y-m-d H:i:s'),
+                        //     'dimension_insp_result' => $request->process_engr_dimension_insp_result,
+                        //     'actual_checking_remarks' => $request->process_engr_actual_checking_remarks,
+                        //     'created_by' => $request->user_id,
+                        //     'last_updated_by' => $request->user_id,
+                        //     'created_at' => date('Y-m-d H:i:s'),
+                        //     'updated_at' => date('Y-m-d H:i:s'),
+                        //     // 'status' => 4 //Change Status to Updated(1)
+                        // ]);
                     }
 
                     DB::commit();
@@ -1711,7 +1900,7 @@ class DmrpqcTsController extends Controller
 
                             $status = $product_req_checking['status'];
                             DmrpqcProductReqChecking::where('request_id', $request->request_id)->update(['last_updated_by' => $dmrpqc_user_id,
-                                                        'status' => $status + 1, 'updated_at' => date('Y-m-d H:i:s'),]);
+                                                        'status' => $status, 'updated_at' => date('Y-m-d H:i:s'),]);
 
                             DmrpqcMachineSetupSample::where('request_id', $request->request_id)->update(['last_updated_by' => $dmrpqc_user_id,
                                                         'status' => $status + 1, 'updated_at' => date('Y-m-d H:i:s'),]);

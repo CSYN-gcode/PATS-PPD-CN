@@ -128,7 +128,7 @@ function ProdReqCheckingEdittingMode(data){
                 // $("#tblProdReqQC .prod_req_checking_data").css("opacity", "");
             }else if(prod_req_checking_data.status == 3){
                 $("#tblProdReqProcessEngr .prod_req_checking_data").attr('disabled', false);
-                $("#tbl_machine_samples #selMachineSetupSamplesEngr").attr('disabled', true);
+                $("#tbl_machine_samples #selMachineSetupSamplesEngr").attr('disabled', false);
                 $("#tblProdReqProcessEngr #frm_txt_process_engr_material_drawing_no").val(p1_details.drawing_no);
                 $("#tblProdReqProcessEngr #frm_txt_process_engr_material_rev_no").val(p1_details.rev_no);
                 $("#tblProdReqProcessEngr #frm_txt_process_engr_insp_guide_drawing_no").val(p1_details.drawing_no);
