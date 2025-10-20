@@ -709,14 +709,14 @@ class DmrpqcTsController extends Controller
                 ->select(' SELECT dieset.id AS dieset_id, po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS po_qty, dieset.DieNo AS die_no, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev
                         FROM tbl_POReceived AS po_receive
                         LEFT JOIN tbl_dieset AS dieset ON po_receive.ItemCode = dieset.R3Code
-                        WHERE OrderNo = "'.$request->po_number.'"
+                        WHERE OrderNo = "'.$request->po_number.'" AND POBalance > "0"
                 ');
         }else{
              $pps_db_details = DB::connection('mysql_rapid_pps')
                 ->select(' SELECT dieset.id AS dieset_id, po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS po_qty, dieset.DieNo AS die_no, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev
                         FROM tbl_POReceived AS po_receive
                         LEFT JOIN tbl_dieset AS dieset ON po_receive.ItemCode = dieset.R3Code
-                        WHERE OrderNo = "'.$request->po_number.'"
+                        WHERE OrderNo = "'.$request->po_number.'" AND POBalance > "0"
                 ');
         }
 

@@ -291,6 +291,10 @@ class ProductionRuncardController extends Controller
 
         $po_balance = $po_details[0]->order_quantity - $po_tll_output->accume_ttl_output;
 
+        if($po_balance < 0){
+            $po_balance = 0;
+        }
+
         if(empty($po_details)){
             $result = 0;
             $po_details = '';
