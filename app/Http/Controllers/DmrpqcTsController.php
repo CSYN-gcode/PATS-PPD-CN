@@ -719,7 +719,10 @@ class DmrpqcTsController extends Controller
                         WHERE OrderNo = "'.$request->po_number.'" AND POBalance > "0"
                 ');
         }
-
+        // return $pps_db_details;
+        if(empty($pps_db_details)){
+            return response()->json(['result' => '3']);
+        }
         // $part_name = explode('-', $pps_db_details[0]->part_name);
         // $part_name = $part_name[0].'-'.$part_name[1];
         // return $part_name;

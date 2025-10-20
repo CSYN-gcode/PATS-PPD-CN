@@ -43,6 +43,8 @@ function GetPPSDBDataByItemCode(po_number, factory_category){
                 toastr.error('Error, Wrong PO Number');
             }else if(response['result'] == '2'){
                 toastr.warning('Device Name is not found in DMCMSV2, please add device first.');
+            }else if(response['result'] == '3'){
+                toastr.warning('PO Balance is already depleted, please use another PO');
             }else{
                 // let pps_details = response['pps_db_details'];
                 let pps_db_data = response['pps_db_details'][0];
