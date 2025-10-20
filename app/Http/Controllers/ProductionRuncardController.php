@@ -269,7 +269,7 @@ class ProductionRuncardController extends Controller
 
         $po_details = DB::connection('mysql_rapid_pps')->select(' SELECT po_receive.ItemName AS part_name, po_receive.OrderNo AS po_number, po_receive.POBalance AS po_quantity, po_receive.DateIssued AS received_date
                             FROM tbl_POReceived AS po_receive
-                            WHERE po_receive.ItemName = "'.$request->device_name.'"'.$andWhere.' ORDER BY po_receive.DateIssued DESC;
+                            WHERE po_receive.ItemName = "'.$request->device_name.'"'.$andWhere.' ORDER BY po_receive.DateIssued ASC;
         ');
 
         return response()->json(['result' => 1, 'po_details' => $po_details]);

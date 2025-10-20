@@ -225,7 +225,7 @@ $(document).ready(function(){
     });
 
     function GetPOFromPPSDB(cboElement, device_name, PoNumber = null){
-        let result = '<option value="" disabled selected> Select PO Number </option>';
+        let result = '<option value="" disabled selected> Select PO Number (Old -> New) </option>';
         $.ajax({
             method: "get",
             url: "get_po_from_ppsdb",
@@ -240,7 +240,7 @@ $(document).ready(function(){
             success: function (response) {
                 let po_details = response['po_details'];
                 if(po_details.length > 0) {
-                        result = '<option value="" disabled selected> Select PO Number </option>';
+                        result = '<option value="" disabled selected> Select PO No. (Oldest - Newest) </option>';
                     for (let index = 0; index < po_details.length; index++) {
                         if(po_details[index]['po_number'] == PoNumber || po_details[index]['po_quantity'] > 0){
                             result += '<option value="' + po_details[index]['po_number'] + '">' + po_details[index]['po_number'] + '</option>';
