@@ -602,7 +602,7 @@
                     "ajax" : {
                         url: "view_oqc_inspection",
                         data: function (pamparam){
-                            pamparam.poNo = getPoNo
+                            pamparam.poNo = getPoNo,
                             pamparam.getStatus = getStatus
                             // pamparam.prodLotNo = $("#txtOQCProdLotNo").val();
                         },
@@ -683,11 +683,11 @@
                             device_name = po.part_name;
                             console.log('device_name', device_name);
 
-                            fetchData(device_name, function(result, error) {
-                                if(error){
-                                    alert("Something went wrong: " + error);
-                                    return;
-                                }
+                            // fetchData(device_name, function(result, error){
+                            //     if(error){
+                            //         alert("Something went wrong: " + error);
+                            //         return;
+                            //     }
 
                                 // if(result.dmrpqc_device_info){ //clark comment for now due to issues in DMRPQC
                                         getPoNo =  po.po_number
@@ -699,13 +699,14 @@
                                 // }else{ //clark comment for now due to issues in DMRPQC
                                 //     alert("Device has no completed DMR & PQC data, Please complete to DMR & PQC first");
                                 // }
-                            });
+                            // });
 
                         }catch (error) {
                             alert('The Scan QR Code was not found!')
                             $('.invalidScan').val('')
                             getPoNo = ''
                         }
+
                         $('#mdlScanQrCode').modal('hide')
                         dataTableOQCInspection.draw()
                         $('#txtScanQrCode').val('')

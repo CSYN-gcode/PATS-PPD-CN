@@ -712,7 +712,6 @@ class DmrpqcTsController extends Controller
                         WHERE OrderNo = "'.$request->po_number.'"
                 ');
         }else{
-            // return 'FACTORY 3';
              $pps_db_details = DB::connection('mysql_rapid_pps')
                 ->select(' SELECT dieset.id AS dieset_id, po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS po_qty, dieset.DieNo AS die_no, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev
                         FROM tbl_POReceived AS po_receive
@@ -721,22 +720,9 @@ class DmrpqcTsController extends Controller
                 ');
         }
 
-        // return $pps_db_details;
         // $part_name = explode('-', $pps_db_details[0]->part_name);
         // $part_name = $part_name[0].'-'.$part_name[1];
         // return $part_name;
-
-        // $device_dmcms = DB::connection('mysql_rapid_molding_dmcms')
-        //         ->table('t_mother_devices AS device')
-        //         ->select('device.*')
-        //         // ->select('device.maint_cycle AS cycle_count, shots.shot, shots.machine_no')
-        //         // ->leftJoin('tbl_shots AS shots', 'device.pkid', '=', 'shots.fkid_device')
-        //         ->where('device.md_logdel', 0)
-        //         // ->where('shots.logdel', 0)
-        //         // LIKE '%".$exploded_device_name[0]."%'
-        //         ->where('device.md_device_name', 'LIKE', "%$part_name%")
-        //         // ->orderBy('shots.prodn_date', 'DESC')
-        //         ->first();
 
         $device_dmcms = DB::connection('mysql_rapid_molding_dmcms')
                 ->table('t_dieset_cycle AS die_cycle')
@@ -746,60 +732,84 @@ class DmrpqcTsController extends Controller
                 // ->where('device.md_device_name', 'LIKE', "%$part_name%")
                 ->first();
 
-        if(empty($device_dmcms)){
-            return response()->json(['result' => '2']);
-        }
+        if(empty($device_dmcms)){ //SANDA DMCMS
+            $device_sanda_dmcms = DB::connection('mysql_rapid_sanda_dmcms')
+                        ->table('t_dieset_cycle AS die_cycle')
+                        ->select('die_cycle.*')
+                        ->where('die_cycle.logdel', 0)
+                        ->where('die_cycle.dc_d_id', $pps_db_details[0]->dieset_id)
+                        // ->where('device.md_device_name', 'LIKE', "%$part_name%")
+                        ->first();
 
-        $shots_details_dmcms = DB::connection('mysql_rapid_molding_dmcms')
+            if(empty($device_sanda_dmcms)){
+                return response()->json(['result' => '2']);
+            }
+
+            $shots_details_dmcms = DB::connection('mysql_rapid_sanda_dmcms')
                 ->table('t_shots')
                 // ->select('shots.*', DB::raw("SUM(`s_count`) as ttl_accum_shots"))
                 ->select('s_d_id', 's_count', 's_machine', DB::raw("SUM(`s_count`) as ttl_accum_shots"))
                 // ->select('device.maint_cycle AS cycle_count, shot, machine_no')
                 // ->leftJoin('tbl_shots AS shots', 'device.pkid', '=', 'fkid_device')
                 // ->where('device.logdel', 0)
-                ->where('s_d_id', $device_dmcms->dc_d_id)
-                ->where('s_dc_id', $device_dmcms->dc_idd)
+                ->where('s_d_id', $device_sanda_dmcms->dc_d_id)
+                ->where('s_dc_id', $device_sanda_dmcms->dc_idd)
                 ->where('s_status', 'ongoing')
-                ->where('s_approval_status', 1)
                 ->where('logdel', 0)
                 ->groupBy('s_d_id', 's_machine', 's_count')
                 ->orderBy('s_date', 'DESC')
                 ->get();
 
-        if(count($shots_details_dmcms) < 1){
-            $shots_details_dmcms = json_decode('{"s_count": 0, "s_machine": 0, "ttl_accum_shots": 0}', true);
-            // $decoded = json_decode($last_shots_dmcms[0], true);
-            // $last_shots_dmcms = json_decode("{'s_count': 0,'s_machine':0,'ttl_accum_shots':0}");
+            if(count($shots_details_dmcms) < 1){
+                $shots_details_dmcms = json_decode('{"s_count": 0, "s_machine": 0, "ttl_accum_shots": 0}', true);
+            }else{
+                $shots_details_dmcms = $shots_details_dmcms[0];
+            }
 
-            // $lastest_shot = 0;
-            // $ttl_accum_shot = 0;
-            // $s_machine = 0;
-        }else{
-            $shots_details_dmcms = $shots_details_dmcms[0];
-        }
+            $ttl_shots_accuum = DB::connection('mysql_rapid_sanda_dmcms')
+                                ->select(' SELECT SUM(`s_count`) as ttl_accum_shots
+                                    FROM t_shots
+                                    WHERE s_status = "ongoing"
+                                    AND logdel = 0
+                                    AND s_d_id = '.$device_sanda_dmcms->dc_d_id.'
+                                ');
 
-            // ->select(' SELECT device.device_name, device.maint_cycle, shots.shot, shots.machine_no
-            //     FROM tbl_device AS device
-            //     LEFT JOIN tbl_shots AS shots ON device.pkid = shots.fkid_device
-            //     WHERE OrderNo = "'.$request->po_number.'"
-            //     ');
+            if(count($ttl_shots_accuum) != 1){
+                $ttl_shots_accuum = 0;
+            }
+        }else{ //DMCMSV2 RESULT
+            // return 'with result';
 
-            // if($shots_stamping_dmcms->id){
-            //     $device_id
-            // }else{
-            // }
+            $shots_details_dmcms = DB::connection('mysql_rapid_molding_dmcms')
+                ->table('t_shots')
+                ->select('s_d_id', 's_count', 's_machine', DB::raw("SUM(`s_count`) as ttl_accum_shots"))
+                ->where('s_d_id', $device_dmcms->dc_d_id)
+                ->where('s_dc_id', $device_dmcms->dc_idd)
+                ->where('s_status', 'ongoing')
+                ->where('s_approval_status', '1')
+                ->where('logdel', 0)
+                ->groupBy('s_d_id', 's_machine', 's_count')
+                ->orderBy('s_date', 'DESC')
+                ->get();
 
-        $ttl_shots_accuum = DB::connection('mysql_rapid_molding_dmcms')
-                            ->select(' SELECT SUM(`s_count`) as ttl_accum_shots
-                                FROM t_shots
-                                WHERE s_status = "ongoing"
-                                AND logdel = 0
-                                AND s_d_id = '.$device_dmcms->dc_d_id.'
-                                AND s_approval_status = 1
-                            ');
+            if(count($shots_details_dmcms) < 1){
+                $shots_details_dmcms = json_decode('{"s_count": 0, "s_machine": 0, "ttl_accum_shots": 0}', true);
+            }else{
+                $shots_details_dmcms = $shots_details_dmcms[0];
+            }
 
-        if(count($ttl_shots_accuum) != 1){
-            $ttl_shots_accuum = 0;
+            $ttl_shots_accuum = DB::connection('mysql_rapid_molding_dmcms')
+                                ->select(' SELECT SUM(`s_count`) as ttl_accum_shots
+                                    FROM t_shots
+                                    WHERE s_status = "ongoing"
+                                    AND logdel = 0
+                                    AND s_d_id = '.$device_dmcms->dc_d_id.'
+                                    AND s_approval_status = 1
+                                ');
+
+            if(count($ttl_shots_accuum) != 1){
+                $ttl_shots_accuum = 0;
+            }
         }
 
         return response()->json(['pps_db_details' => $pps_db_details, 'device_details' => $device_dmcms, 'shots_details' => $shots_details_dmcms, 'shots_accum' => $ttl_shots_accuum]);
