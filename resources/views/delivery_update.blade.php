@@ -307,7 +307,7 @@
             let poNumber
             let firstRow
             let columnFirstValue
-            
+
             $(document).ready(function(){
                 dtDeliveryUpdate = $("#tblDeliveryUpdate").DataTable({
                     "processing": true,
@@ -326,7 +326,7 @@
                         { data: "action", orderable:false, searchable:false },
                         { data: "actual_so", orderable:false, searchable:false },
                         { data: "variance", orderable:false, searchable:false },
-                        { data: "lot_no", 
+                        { data: "lot_no",
                             render: {
                             display: function (data, type, row) {
                                 // return row.oqc_stamp;
@@ -338,7 +338,7 @@
                                 }
                             },
                             },
-                            orderable:false, searchable:false 
+                            orderable:false, searchable:false
                         },
                         { data: "created_by", orderable:false, searchable:false },
                         { data: "created_at", orderable:false, searchable:false },
@@ -355,7 +355,7 @@
                     },
                 }); //end of dataTableDevices
 
-                $('#btnAddDelivery').on('click', function(){    
+                $('#btnAddDelivery').on('click', function(){
                     if($('#txtSearchPO').val() == '' || $('#txtDeviceName').val() == '' || $('#txtDeviceCode').val() == '' || $('#txtPoQty').val() == ''){
                         toastr.error('Please Scan PO Number!');
                         return;
@@ -363,7 +363,7 @@
                         checking = 0
                         GetEmployeeName($('.select-user'))
                         GetLotNo($('.lot-no'), $('#txtSearchPO').val(), checking);
-                        $('#txtPo').val($('#txtSearchPO').val());    
+                        $('#txtPo').val($('#txtSearchPO').val());
                         $('#modalDeliveryUpdate').modal('show');
                         $('.prev').removeClass('d-none')
 
@@ -373,7 +373,7 @@
                         $('#txtDeliveryUpdatePreviousOrderQty').val(columnFirstValue);
                     }
                 });
-                
+
                 $('#modalDeliveryUpdate').on('shown.bs.modal', function () {
                     $('#txtPoReceivedQuantity').val($('#txtPoQty').val());
                 });
@@ -453,6 +453,8 @@
                         }else if($('#btnValue').val() == 1){
                             try {
                                 scanQrCodeDetails = JSON.parse($(this).val())
+                                console.log(scanQrCodeDetails['id']);
+
                                 if(typeof scanQrCodeDetails == 'object'){
                                     let scanChecking = Object.hasOwn(scanQrCodeDetails, 'production_lot');
                                     let orderNumber = $('#txtSearchPO').val();
@@ -475,7 +477,7 @@
                             }
                         }else{
                             let employeeID = $(this).val();
-                            
+
                             $('#scanBy').val(employeeID).trigger('change')
                         }
                         $('#modalScanning').modal('hide');
@@ -486,7 +488,7 @@
                     $('#txtScanning').val('');
                 });
 
-                // $('#btnScanProdnRuncardCode').click(function (e) { 
+                // $('#btnScanProdnRuncardCode').click(function (e) {
                 //     e.preventDefault();
                 //     console.log('object: ', $('#slctPackageCategory').val());
                 //     $('.btnDeliveryUpdate').val('0')
@@ -495,7 +497,7 @@
                 //     }else{
                 //         alert('Select Package Category')
                 //     }
-                    
+
                 // });
 
                 $('#slctRuncardNum').change(function (e) {
@@ -529,7 +531,7 @@
 
                             if(runcardDetails.length > 0){
                                 actualSo.val(runcardDetails[0].shipment_output)
-                                
+
                                 if(runcardDetails[0].delivery_update_details == null){
                                     if(checkDeliveryUpdate == true){
                                         $('#txtDeliveryUpdateVariance').val(previousOrderQty.val() - actualSo.val())
@@ -581,7 +583,7 @@
                     }, 555);
                 });
 
-                $('#slctPackageCategory').change(function (e) { 
+                $('#slctPackageCategory').change(function (e) {
                     e.preventDefault();
                     $('#checkBoxLotCategory').prop('disabled', false)
                     let getRuncardNumber = $('#slctRuncardNum option:selected').text();
@@ -638,7 +640,7 @@
                     // }
                 });
 
-                $('#checkBoxLotCategory').change(function (e) { 
+                $('#checkBoxLotCategory').change(function (e) {
                     e.preventDefault();
                     if($('#checkBoxLotCategory').is(':checked')){
                         $('#checkBoxLotCategory').val('1')
@@ -656,21 +658,21 @@
                 $(document).on('click', '.btnDeliveryUpdate', function(e){
                     e.preventDefault();
 
-                    let deliveryUpdateId = $(this).attr('delivery_update-id'); 
+                    let deliveryUpdateId = $(this).attr('delivery_update-id');
                     $("#checkBoxLotCategory").prop('disabled', false);
                     $("#txtDeliveryUpdateId").val(deliveryUpdateId);
                     $('.btnDeliveryUpdate').val('1')
                     $('.prev').addClass('d-none')
 
-                    GetDeliveryUpdateInfoByIdToEdit(deliveryUpdateId); 
+                    GetDeliveryUpdateInfoByIdToEdit(deliveryUpdateId);
 
-                    let row = $(this).closest('tr');  
+                    let row = $(this).closest('tr');
                     let columnValue = row.find('td:eq(2)').text();
-                    
+
                     $('#txtDeliveryUpdateVariance').val(columnValue)
                 });
 
-                $('#formSaveDeliveryUpdate').submit(function (e) { 
+                $('#formSaveDeliveryUpdate').submit(function (e) {
                     e.preventDefault();
                     saveDeliveryUpdate($('#formSaveDeliveryUpdate'));
                 });
