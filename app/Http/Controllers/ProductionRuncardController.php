@@ -1083,6 +1083,7 @@ class ProductionRuncardController extends Controller
                         // }
                     // }
                     $qrPayload = [
+                        'id'                => $runcard->id,
                         'po_number'         => $runcard->po_number,
                         'po_quantity'       => $runcard->po_quantity,
                         'part_name'         => $runcard->part_name,
@@ -1099,6 +1100,7 @@ class ProductionRuncardController extends Controller
                     $sticker_count = $i . '/' . count($cavity_details);
 
                     $qrPayload = [
+                        'id'                => $runcard->id,
                         'po_number'         => $runcard->po_number,
                         'po_quantity'       => $runcard->po_quantity,
                         'part_name'         => $runcard->part_name,
