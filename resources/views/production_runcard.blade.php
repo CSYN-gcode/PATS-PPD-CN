@@ -251,6 +251,12 @@
                                         </div>
                                         <input type="text" class="form-control form-control-sm" id="txtShipmentOutput" name="shipment_output" placeholder="Auto Compute" readonly>
                                     </div>
+                                    <div class="input-group input-group-sm mb-3">
+                                        <div class="input-group-prepend w-50">
+                                            <span class="input-group-text w-100">Yield</span>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm" id="txtComputedYield" name="computed_yield" placeholder="Auto Compute" readonly>
+                                    </div>
                                     {{-- <div class="col-sm-12"> --}}
                                         <div class="d-sm-inline-block">
                                             <div class="input-group input-group-sm mb-2">
