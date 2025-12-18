@@ -1418,6 +1418,10 @@ $(document).ready(function(){
 
                 $('#formProductionRuncard #txtShipmentOutput').val(station_data.shipment_output);
 
+                // let computed_yield = station_data.shipment_output /
+
+                // $('#formProductionRuncard #txtComputedYield').val(station_data.computed_yield);
+
                 $('#formAddProductionRuncardStation #txtRemarks').val(station_data.station_remarks);
                 // $('#formAddProductionRuncardStation #txtMachineNo').val(station_data.station_plastic_injection_machine_no);
                 $('#formAddProductionRuncardStation #txtDate').val(station_data.station_date);
