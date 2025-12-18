@@ -53,8 +53,8 @@
                     @endif
 
                     {{-- PRODUCTION MODULES --}}
-                    <li class="nav-header mt-3"><strong>PRODUCTION MODULES</strong></li>
                     @if ( in_array(Auth::user()->position, [0,1,4,11,12,13,17]) ){{-- ISS, PROD-Machine,PROD-Visual Positions --}}
+                        <li class="nav-header mt-3"><strong>PRODUCTION MODULES</strong></li>
                         <li class="nav-item">
                             <a href="{{ route('production_runcard') }}" class="nav-link">
                                 <i class="fas fa-microchip"> </i>
@@ -64,9 +64,9 @@
                     @endif
 
                     {{-- QC MODULES --}}
-                    <li class="nav-header mt-3"><strong>QUALITY CONTROL</strong></li>
                     @if ( in_array(Auth::user()->position, [0,1,2,5,6,7,8,10,]) ){{-- ISS, QC, PPC, WAREHOUSE Positions --}}
                         @if ( in_array(Auth::user()->position, [0,2,5,17]) ){{-- ISS, PPC, WAREHOUSE Positions --}}
+                            <li class="nav-header mt-3"><strong>QUALITY CONTROL</strong></li>
                             <li class="nav-item">
                                 <a href="{{ route('iqc_inspection') }}" class="nav-link">
                                     <i class="fas fa-microscope"> </i>
@@ -93,8 +93,8 @@
                     @endif
 
                     {{-- COMMON MODULES --}}
-                    <li class="nav-header mt-3"><strong>OTHER MODULES</strong></li>
                     @if ( in_array(Auth::user()->position, [0,1,2,6,7,8,10,17]) ){{-- ISS, PPC, WAREHOUSE Positions --}}
+                        <li class="nav-header mt-3"><strong>OTHER MODULES</strong></li>
                         <li class="nav-item">
                             <a href="{{ route('Material_Issuance_Monitoring_Form_V2') }}" class="nav-link">
                                 <i class="fa-solid fa-person-chalkboard"></i>
@@ -165,7 +165,7 @@
 
 
                     <li class="nav-header mt-3"><strong>PACKING MODULES</strong></li>
-                     @if ( in_array(Auth::user()->position, [0,1,17]) ){{-- ISS, PRODNSUPV , PACKING --}}
+                     @if ( in_array(Auth::user()->position, [0,1,17,18]) ){{-- ISS, PRODNSUPV , PACKING --}}
                         <li class="nav-item">
                             <a href="{{ route('delivery_update') }}" class="nav-link">
                                 <i class="fa-solid fa-cubes"> </i>

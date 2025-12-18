@@ -615,7 +615,8 @@
                             let rangeFound = false;
 
                             for (let range of timeRanges) {
-                                if (startTime === range.start && endTime <= range.end) {
+                                // if (startTime === range.start && endTime <= range.end) { // OLD CODE
+                                if (startTime >= range.start && endTime <= range.end) { // CHAN - 12-17-2025
                                     timeRangeCount = range.count;
                                     console.log(range.message);
                                     rangeFound = true;

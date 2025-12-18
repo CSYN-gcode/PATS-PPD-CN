@@ -985,14 +985,18 @@ $(document).ready(function(){
                     }
 
                     for (let i = 0; i < uniquePODetails.length; i++){
-                        // if(uniquePODetails[i].po_no != null){
                             result_po += '<option device_name="'+uniquePODetails[i].device_name+'" parts_code="'+uniquePODetails[i].parts_code+'" value="'+uniquePODetails[i].po_no+'">'+uniquePODetails[i].po_no+'</option>';
-                        // }
-
                         // if(uniquePODetails[i].lot_no != null){
-                            result_lot_no += '<option value="'+uniquePODetails[i].lot_no+'">'+uniquePODetails[i].lot_no+'</option>';
+                            // result_lot_no += '<option value="'+uniquePODetails[i].lot_no+'">'+uniquePODetails[i].lot_no+'</option>';
                         // }
                     }
+
+                    for (let i = 0; i < uniqueLotNoDetails.length; i++){
+                        if(uniqueLotNoDetails[i].lot_no != null){
+                            result_lot_no += '<option value="'+uniqueLotNoDetails[i].lot_no+'">'+uniqueLotNoDetails[i].lot_no+'</option>';
+                        }
+                    }
+
                 }else{
                     result_po = '<option value="0" selected disabled> -- No record found -- </option>';
                     result_lot_no = '<option value="0" selected disabled> -- No record found -- </option>';
