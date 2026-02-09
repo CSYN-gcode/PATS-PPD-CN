@@ -46,11 +46,10 @@ function GetPPSDBDataByItemCode(po_number, factory_category){
             }else if(response['result'] == '3'){
                 toastr.warning('PO Balance is already depleted, please use another PO');
             }else{
-                // let pps_details = response['pps_db_details'];
                 let pps_db_data = response['pps_db_details'][0];
-                let device_details = response['device_details'];
-                let shots_details = response['shots_details'];
-                let shots_accum = response['shots_accum'][0];
+                // let device_details = response['device_details'];
+                // let shots_details = response['shots_details'];
+                // let shots_accum = response['shots_accum'][0];
 
                 $("#frm_txt_device_name").val(pps_db_data.part_name);
                 $("#frm_txt_po_no").val(pps_db_data.po_number);
@@ -59,10 +58,10 @@ function GetPPSDBDataByItemCode(po_number, factory_category){
                 $("#frm_txt_drawing_no").val(pps_db_data.drawing_no);
                 $("#frm_txt_rev_no").val(pps_db_data.drawing_rev);
 
-                $("#frm_txt_prev_shots").val(shots_details.s_count);
-                $("#frm_txt_prev_shot_accum").val(shots_details.ttl_accum_shots);
-                $("#frm_txt_prev_maint_cycle").val(device_details.dc_maintenance_cycle);
-                $("#frm_txt_prev_machine_no").val(shots_details.s_machine);
+                // $("#frm_txt_prev_shots").val(shots_details.s_count);
+                // $("#frm_txt_prev_shot_accum").val(shots_details.ttl_accum_shots);
+                // $("#frm_txt_prev_maint_cycle").val(device_details.dc_maintenance_cycle);
+                // $("#frm_txt_prev_machine_no").val(shots_details.s_machine);
             }
         }
     });
