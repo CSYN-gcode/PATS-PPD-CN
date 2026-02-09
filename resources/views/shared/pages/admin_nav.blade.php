@@ -165,7 +165,7 @@
 
 
                     <li class="nav-header mt-3"><strong>PACKING MODULES</strong></li>
-                     @if ( in_array(Auth::user()->position, [0,1,3,7,8,17,18]) ){{-- ISS, PRODNSUPV , PACKING --}}
+                    @if ( in_array(Auth::user()->position, [0,1,3,7,8,17,18]) ){{-- ISS, PRODNSUPV , PACKING --}}
                         <li class="nav-item">
                             <a href="{{ route('delivery_update') }}" class="nav-link">
                                 <i class="fa-solid fa-cubes"> </i>
@@ -190,29 +190,28 @@
                                 <p>Pre-Shipment</p>
                             </a>
                         </li>
-
-                        @if ( in_array(Auth::user()->position, [0,1,2,3,5,6,17,18]))
-                            <li class="nav-header mt-3"><strong>RAPIDX Pre-Shipment</strong></li>
-                            <li class="nav-item">
-                                <a href="{{ route('rapidx_pre_shipment') }}" class="nav-link">
-                                    <i class="fa-solid fa-qrcode"> </i>
-                                    <p class="">Home</p>
-                                </a>
-                            </li>
-                        @endif
-                        {{-- <li class="nav-item">
-                            <a href="{{ route('rapidx_pre_shipment') }}" class="nav-link">
-                                <i class="fa-solid fa-qrcode"> </i>
-                                <p>MH</p>
-                            </a>
-                        </li>
+                    @endif
+                    @if ( in_array(Auth::user()->position, [0,1,2,3,5,6,17,18]))
+                        <li class="nav-header mt-3"><strong>RAPIDX Pre-Shipment</strong></li>
                         <li class="nav-item">
                             <a href="{{ route('rapidx_pre_shipment') }}" class="nav-link">
                                 <i class="fa-solid fa-qrcode"> </i>
-                                <p>QC</p>
+                                <p class="">Home</p>
                             </a>
-                        </li> --}}
+                        </li>
                     @endif
+                    {{-- <li class="nav-item">
+                        <a href="{{ route('rapidx_pre_shipment') }}" class="nav-link">
+                            <i class="fa-solid fa-qrcode"> </i>
+                            <p>MH</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('rapidx_pre_shipment') }}" class="nav-link">
+                            <i class="fa-solid fa-qrcode"> </i>
+                            <p>QC</p>
+                        </a>
+                    </li> --}}
 
                     {{-- FROM PPTS v1 --}}
                     {{-- <li class="nav-header mt-3 font-weight-bold">MOLDING PACKING</li>
@@ -252,7 +251,6 @@
                             </ul>
                         </li>
                     </li> --}}
-
                 @endauth
 
             </ul>
