@@ -754,7 +754,8 @@ class ProductionRuncardController extends Controller
 
     public function CheckExistingStations(Request $request){
         $prod_runcard_details = ProductionRuncard::with('device_details.material_process.station_details.stations', 'runcard_station')->where('id', $request->runcard_id)->whereNull('deleted_at')->first();
-
+        // $prod_runcard_details = ProductionRuncard::with('device_details', 'runcard_station')->where('id', $request->runcard_id)->whereNull('deleted_at')->first();
+        // return $prod_runcard_details;
         // **CHECK IF ANNEALING IS IN MATERIAL PROCESS
         $is_annealing_station_exist = 'False';
         foreach($prod_runcard_details->device_details->material_process as $process){
@@ -943,7 +944,7 @@ class ProductionRuncardController extends Controller
         })
         ->where('status', 1)
         ->get();
-
+        // return $matrix_data;
         if(count($matrix_data[0]->material_process) > 0){
             foreach($matrix_data[0]->material_process[0]->material_details as $material_details){
                 $material_name[] = $material_details->material_type;
