@@ -163,9 +163,8 @@
                         </li>
                     @endif
 
-
-                    <li class="nav-header mt-3"><strong>PACKING MODULES</strong></li>
                     @if ( in_array(Auth::user()->position, [0,1,3,7,8,17,18]) ){{-- ISS, PRODNSUPV , PACKING --}}
+                        <li class="nav-header mt-3"><strong>PACKING MODULES</strong></li>
                         <li class="nav-item">
                             <a href="{{ route('delivery_update') }}" class="nav-link">
                                 <i class="fa-solid fa-cubes"> </i>
