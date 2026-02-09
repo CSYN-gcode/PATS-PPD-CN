@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddNewColumnToDevicesTable extends Migration
+class AddNewColumnToShipmentDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class AddNewColumnToDevicesTable extends Migration
      */
     public function up()
     {
-        Schema::table('devices', function (Blueprint $table) {
-            $table->string('cavity_count')->nullable()->after('code');
+        Schema::table('shipment_details', function (Blueprint $table) {
+            $table->string('category')->nullable()->after('lot_no');
+            $table->string('product_po_no')->nullable()->after('category');
         });
     }
 
@@ -25,9 +26,8 @@ class AddNewColumnToDevicesTable extends Migration
      */
     public function down()
     {
-        Schema::table('devices', function (Blueprint $table) {
-            $table->dropColumn('cavity_count');
+        Schema::table('shipment_details', function (Blueprint $table) {
+            //
         });
     }
 }
-

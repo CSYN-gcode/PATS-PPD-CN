@@ -431,7 +431,7 @@ class ProductionRuncardController extends Controller
                                     'required_qty'    => $request->required_output,
                                     'machine_no'      => $request->machine_number,
                                     'production_lot'  => $request->production_lot,
-                                    'shipment_output' => $request->shipment_output,
+                                    // 'shipment_output' => $request->shipment_output,
                                     'drawing_no'      => $request->drawing_no,
                                     'drawing_rev'     => $request->drawing_rev,
                                     'material_name'   => $request->material_name,
@@ -464,7 +464,7 @@ class ProductionRuncardController extends Controller
                                     'required_qty'    => $request->required_output,
                                     'machine_no'      => $request->machine_number,
                                     'production_lot'  => $request->production_lot,
-                                    'shipment_output' => $request->shipment_output,
+                                    // 'shipment_output' => $request->shipment_output,
                                     'drawing_no'      => $request->drawing_no,
                                     'drawing_rev'     => $request->drawing_rev,
                                     'material_name'   => $request->material_name,
@@ -526,7 +526,7 @@ class ProductionRuncardController extends Controller
                             })->get();
 
         if(isset($request->prod_runcard_station_id)){
-            $mode_of_defect_data =  ProductionRuncardStationMod::with(['mode_of_defect'])->where('prod_runcard_stations_id', $request->prod_runcard_station_id)
+            $mode_of_defect_data = ProductionRuncardStationMod::with(['mode_of_defect'])->where('prod_runcard_stations_id', $request->prod_runcard_station_id)
             ->whereNull('deleted_at')
             ->get();
         }else{
@@ -534,7 +534,7 @@ class ProductionRuncardController extends Controller
         }
 
         if(isset($request->prod_runcard_station_id)){
-            $cavity_count_data =  ProductionRuncardCavity::where('prod_runcards_id', $request->prod_runcard_id)
+            $cavity_count_data = ProductionRuncardCavity::where('prod_runcards_id', $request->prod_runcard_id)
                                                         ->whereNull('deleted_at')
                                                         ->get();
 
@@ -611,6 +611,7 @@ class ProductionRuncardController extends Controller
                         ProductionRuncard::where('id', $request->frmstations_runcard_id)
                             ->update([
                                     'shipment_output'  => $request->output_qty,
+                                    'computed_yield'   => $request->output_qty / $request->input_qty * 100 . '%',
                                     'last_updated_by'  => Auth::user()->id,
                             ]);
                     }
@@ -638,6 +639,7 @@ class ProductionRuncardController extends Controller
                     ProductionRuncard::where('id', $request->frmstations_runcard_id)
                         ->update([
                                 'shipment_output'  => $request->output_qty,
+                                'computed_yield'   => $request->output_qty / $request->input_qty * 100 . '%',
                                 'last_updated_by'  => Auth::user()->id,
                         ]);
                 }
@@ -702,8 +704,8 @@ class ProductionRuncardController extends Controller
                         }
                     }
 
-                // return response()->json(['result' => 1, 'station' => $request->runcard_station,  'shipment_output' => $request->output_qty]);
-                return response()->json(['result' => 1]);
+                return response()->json(['result' => 1, 'station' => $request->runcard_station, 'shipment_output' => $request->output_qty, 'computed_yield' => $request->output_qty / $request->input_qty * 100 . '%' ]);
+                // return response()->json(['result' => 1]);
             } catch (\Throwable $th) {
                 return $th;
             }

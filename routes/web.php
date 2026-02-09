@@ -21,6 +21,7 @@ use App\Http\Controllers\QualificationController;
 use App\Http\Controllers\MaterialProcessController;
 use App\Http\Controllers\ProductionRuncardController;
 use App\Http\Controllers\PreShipmentController;
+use App\Http\Controllers\DbPpsPreShipmentController;
 use App\Http\Controllers\DeliveryUpdateController;
 use App\Http\Controllers\DeliveryConfirmationController;
 use App\Http\Controllers\LottraceabilityController;
@@ -132,7 +133,7 @@ Route::view('/ppts_packing_and_shipping','ppts_packing_and_shipping')->name('ppt
 Route::view('/ppts_export_packing_and_shipping','ppts_export_packing_and_shipping')->name('ppts_export_packing_and_shipping');
 
 /* PRE-SHIPMENT */
-Route::view('/rapid_pre_shipment','rapid_pre_shipment')->name('rapid_pre_shipment');
+Route::view('/pre_shipment','rapid_pre_shipment')->name('pre_shipment');
 Route::view('/rapidx_pre_shipment','rapidx_pre_shipment_validation')->name('rapidx_pre_shipment');
 
 // ASSEMBLY FVI
@@ -352,9 +353,27 @@ Route::controller(ShipmentController::class)->group(function() {
     Route::get('/load_preshipment_details', 'loadPreshipmentDetails')->name('load_preshipment_details');
 });
 
-
 /* PRESHIPMENT Controller */
-Route::controller(PreShipmentController::class)->group(function(){
+// Route::controller(PreShipmentController::class)->group(function(){
+//     Route::get('/get_preshipment_destination', 'getPreShipmentDestination')->name('get_preshipment_destination');
+//     Route::get('/get_control_numbers', 'getControlNumbers')->name('get_control_numbers');
+//     Route::get('/view_pre_shipment', 'viewPreShipment')->name('view_pre_shipment');
+//     Route::get('/view_pre_shipment_details', 'viewPreShipmentDetails')->name('view_pre_shipment_details');
+//     Route::get('/view_search_po_result', 'viewSearchPoResult')->name('view_search_po_result');
+//     Route::post('/add_pre_shipment_data', 'addPreShipmentData')->name('add_pre_shipment_data');
+//     Route::get('/get_pre_shipment_data', 'getPreShipmentData')->name('get_pre_shipment_data');
+//     Route::post('/add_preshipmt_details_data', 'addPreShipmentDetailsData')->name('add_preshipmt_details_data');
+//     Route::get('/get_users_by_pos', 'getUsersByPos')->name('get_users_by_pos');
+//     Route::get('/get_preshipment_by_id', 'getPreShipDetailsById')->name('get_preshipment_by_id');
+//     Route::get('/get_preshipment_to_print', 'getPreShipmentForPrint')->name('get_preshipment_to_print');
+//     Route::post('/get_preview_qr_code', 'getPreShipDataForPreview')->name('get_preview_qr_code');
+//     Route::get('/get_po_from_delivery_update', 'GetPOFromDeliveryUpdate')->name('get_po_from_delivery_update');
+//     Route::get('/get_data_from_delivery_update', 'searchPoDeliveryUpdate')->name('get_data_from_delivery_update');
+// });
+
+// CLARK TESTING CONTROLLER
+/* PRESHIPMENT Controller */
+Route::controller(DbPpsPreShipmentController::class)->group(function(){
     Route::get('/get_preshipment_destination', 'getPreShipmentDestination')->name('get_preshipment_destination');
     Route::get('/get_control_numbers', 'getControlNumbers')->name('get_control_numbers');
     Route::get('/view_pre_shipment', 'viewPreShipment')->name('view_pre_shipment');
@@ -369,17 +388,6 @@ Route::controller(PreShipmentController::class)->group(function(){
     Route::post('/get_preview_qr_code', 'getPreShipDataForPreview')->name('get_preview_qr_code');
     Route::get('/get_po_from_delivery_update', 'GetPOFromDeliveryUpdate')->name('get_po_from_delivery_update');
     Route::get('/get_data_from_delivery_update', 'searchPoDeliveryUpdate')->name('get_data_from_delivery_update');
-
-    // Route::get('/get_po_from_ppsdb', 'GetPOFromPPSDB')->name('get_po_from_ppsdb');
-    // Route::get('/get_machine_no_from_matrix', 'GetMachineNoFromMatrix')->name('get_machine_no_from_matrix');
-    // Route::get('/search_po_from_ppsdb', 'searchPoFromPpsDb')->name('search_po_from_ppsdb');
-    // Route::get('/validate_material_lot_number', 'ValidateMatLotNumber')->name('validate_material_lot_number');
-    // Route::get('/get_data_from_matrix', 'GetMatrixDataByDevice')->name('get_data_from_matrix');
-    // Route::get('/chck_existing_stations', 'CheckExistingStations')->name('chck_existing_stations');
-    // Route::get('/chck_existing_sub_stations', 'CheckExistingSubStations')->name('chck_existing_sub_stations');
-    // Route::post('/update_prod_runcard_status', 'UpdateProdRuncardStatus')->name('update_prod_runcard_status');
-    // Route::post('/submit_prod_runcard', 'SubmitProdRuncard')->name('submit_prod_runcard');
-    // Route::get('/get_mode_of_defect_for_prod', 'GetModeOfDefect')->name('get_mode_of_defect_for_prod');
 });
 
 Route::controller(DeliveryConfirmationController::class)->group(function(){

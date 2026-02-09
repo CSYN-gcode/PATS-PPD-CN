@@ -185,18 +185,31 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('rapid_pre_shipment') }}" class="nav-link">
+                            <a href="{{ route('pre_shipment') }}" class="nav-link">
                                 <i class="fa-solid fa-qrcode"> </i>
-                                <p>RAPID Pre-Shipment</p>
+                                <p>Pre-Shipment</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-header mt-3"><strong>RAPIDX Pre-Shipment</strong></li>
+                        <li class="nav-item">
+                            <a href="{{ route('rapidx_pre_shipment') }}" class="nav-link">
+                                <i class="fa-solid fa-qrcode"> </i>
+                                <p class="">Home</p>
+                            </a>
+                        </li>
+                        {{-- <li class="nav-item">
+                            <a href="{{ route('rapidx_pre_shipment') }}" class="nav-link">
+                                <i class="fa-solid fa-qrcode"> </i>
+                                <p>MH</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('rapidx_pre_shipment') }}" class="nav-link">
                                 <i class="fa-solid fa-qrcode"> </i>
-                                <p>RAPIDX Pre-Shipment Validation</p>
+                                <p>QC</p>
                             </a>
-                        </li>
-
+                        </li> --}}
                     @endif
 
                     {{-- FROM PPTS v1 --}}

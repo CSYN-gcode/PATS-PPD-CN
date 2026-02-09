@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddNewColumnToDevicesTable extends Migration
+class AddShipmentIdToShipmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddNewColumnToDevicesTable extends Migration
      */
     public function up()
     {
-        Schema::table('devices', function (Blueprint $table) {
-            $table->string('cavity_count')->nullable()->after('code');
+        Schema::table('shipments', function (Blueprint $table) {
+            $table->string('preshipment_id')->nullable()->after('id')->comment ='id from table db_pps_preshipments';
         });
     }
 
@@ -25,9 +25,8 @@ class AddNewColumnToDevicesTable extends Migration
      */
     public function down()
     {
-        Schema::table('devices', function (Blueprint $table) {
-            $table->dropColumn('cavity_count');
+        Schema::table('shipments', function (Blueprint $table) {
+            //
         });
     }
 }
-

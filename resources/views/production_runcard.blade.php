@@ -245,13 +245,13 @@
                                             {{-- <input type="text" class="form-control form-control-sm" style="width: 25%" id="txtProductionLotTime" name="production_lot_time" placeholder="07:30-04:30"> --}}
                                         {{-- </div> --}}
                                     </div>
-                                    <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group input-group-sm mb-2">
                                         <div class="input-group-prepend w-50">
                                             <span class="input-group-text w-100">Shipment Output</span>
                                         </div>
                                         <input type="text" class="form-control form-control-sm" id="txtShipmentOutput" name="shipment_output" placeholder="Auto Compute" readonly>
                                     </div>
-                                    <div class="input-group input-group-sm mb-3">
+                                    <div class="input-group input-group-sm mb-2">
                                         <div class="input-group-prepend w-50">
                                             <span class="input-group-text w-100">Yield</span>
                                         </div>

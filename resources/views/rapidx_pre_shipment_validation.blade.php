@@ -14,7 +14,7 @@
  	<section class="content-header">
 		<div class="container-fluid">
 			<div class="row mb-2">
-				<div class="col-sm-6">
+				<div class="col-lg-6">
 					<h1><a href="{{ route('rapidx_pre_shipment') }}">Dashboard</a></h1>
 				</div>
 				<div class="col-sm-6">
@@ -36,7 +36,7 @@
 					<!-- general form elements -->
 					<div>
 						{{-- <iframe  src="http://rapidx/OnlinePreShipmentPATS/iframe_request?username={{ Auth::user()->username }}&emp_id={{ Auth::user()->employee_id }}&iframe=export_report" style="border: none;" no-border height="850" width="100%"></iframe> --}}
-						<iframe  src="http://rapidx/OnlinePreShipmentPATS/iframe_request" style="border: none;" no-border height="850" width="100%"></iframe>
+						<iframe  src="http://rapidx/OnlinePreShipmentPATS/iframe_request?iframe=1&username={{ Auth::user()->username }}&emp_id={{ Auth::user()->employee_id }}" style="border: none;" no-border height="850" width="100%"></iframe>
 					</div>
 				</div>
 			</div>

@@ -41,7 +41,7 @@ function GetControlNo(cboElement){
             if(ControlNo.length > 0) {
                     result = '<option value="" disabled selected> Select Control No </option>';
                 for (let index = 0; index < ControlNo.length; index++) {
-                    result += '<option value="' + ControlNo[index].control_no + '">' + ControlNo[index].control_no + '</option>';
+                    result += '<option value="' + ControlNo[index].Packing_List_CtrlNo + '">' + ControlNo[index].Packing_List_CtrlNo + '</option>';
                 }
             }else{
                 result = '<option value="0" selected disabled> -- No record found -- </option>';
@@ -219,7 +219,6 @@ const getLotNoByPreShipId = (cboElement, preShipId) => {
 // }
 
 const getDestination = (cboElement1, PoNumber = null) => {
-    // console.log('getPOFromDeliveryUpdate', PoNumber);
 
     let result = '<option value="" disabled selected> Select PO Number </option>';
     $.ajax({
@@ -253,9 +252,8 @@ const getDestination = (cboElement1, PoNumber = null) => {
 }
 
 const getPOFromDeliveryUpdate = (cboElement1, PoNumber = null) => {
-    // console.log('getPOFromDeliveryUpdate', PoNumber);
 
-    let result = '<option value="" disabled selected> Select PO Number </option>';
+    let result = '<option value="" disabled selected> Select PO No. </option>';
     $.ajax({
         type: "get",
         url: "get_po_from_delivery_update",
@@ -266,7 +264,7 @@ const getPOFromDeliveryUpdate = (cboElement1, PoNumber = null) => {
         success: function (response) {
             let po_details = response['po_details'];
             if(po_details.length > 0) {
-                    result = '<option value="" disabled selected> Select PO Number </option>';
+                    result = '<option value="" disabled selected> Select PO No. </option>';
                 for (let i = 0; i < po_details.length; i++) {
                     result += `<option value="${po_details[i].po_no}">${po_details[i].po_no}</option>`;
                 }
@@ -287,10 +285,6 @@ const getPOFromDeliveryUpdate = (cboElement1, PoNumber = null) => {
 }
 
 $(document).ready(function(){
-
-    getUsers($('#txtWeighedBy'), '0,1,2,3,4,5');
-    getUsers($('#txtPackedBy'), '0,1,2,3,4,5');
-    getUsers($('#txtCheckedBy'), '0,1,2,3,4,5');
     getPOFromDeliveryUpdate($('#txtPONumber'));
 
     // Apply Select2 to all select elements inside any modal dynamically
@@ -343,11 +337,11 @@ $(document).ready(function(){
             { "data" : "id", searchable:false,visible:false },
             { "data" : "action", orderable:false, searchable:false },
             { "data" : "status" },
-            { "data" : "date" },
-            { "data" : "station" },
-            { "data" : "control_no" },
-            { "data" : "shipment_date" },
-            { "data" : "destination" },
+            { "data" : "Date" },
+            { "data" : "Station" },
+            { "data" : "Packing_List_CtrlNo" },
+            { "data" : "Shipment_Date" },
+            { "data" : "Destination" },
         ],
         "columnDefs": [
             {"className": "dt-center", "targets": "_all"},
@@ -360,7 +354,7 @@ $(document).ready(function(){
         "order": [0, 'desc']
     });
 
-    dtPreShipmentDetials = $("#tblPreShipmentDetails").DataTable({
+    dtPreShipmentDetails = $("#tblPreShipmentDetails").DataTable({
         "processing" : true,
         "serverSide" : true,
         "ajax" : {
@@ -404,7 +398,7 @@ $(document).ready(function(){
             url: "view_search_po_result",
             data: function (param){
                 param.po_number = $('#formAddPreShipmentDetails #txtPONumber').val();
-                param.pre_ship_details_id = $('#formAddPreShipmentDetails #txtPreShipmentDetailsId').val();
+                param.pre_shipment_id = $('#formAddPreShipmentDetails #txtFrmDataPreShipmentId').val();
             },
         },
         fixedHeader: true,
@@ -414,7 +408,7 @@ $(document).ready(function(){
             { "data" : "item_no" },
             { "data" : "lot_numbers" },
             { "data" : "quantities" },
-            { "data" : "row_package_cat" },
+            // { "data" : "row_package_cat" },
             { "data" : "row_package_qty" },
             { "data" : "row_remarks" },
             { "data" : "remove_btn" },
@@ -484,30 +478,24 @@ $(document).ready(function(){
     });
 
     $('#btnAddPreShipment').on('click', function(e){
-        if($('#txtSelectControlNumber').val() != "" && $('#txtSearchMaterialName').val() != ""){
-            $('#modalPreShipment').modal('show');
-            $('#txtPartName').val($('#txtSelectControlNumber').val());
-            $('#txtPartCode').val($('#txtSearchDeviceCode').val());
-            $('#txtRequiredOutput').val($('#txtSearchReqOutput').val());
+        getUsers($('#txtWeighedBy'), '1,18'); //Prod Supervisor, Packing Operator
+        getUsers($('#txtPackedBy'), '1,18');  //Prod Supervisor, Packing Operator
+        getUsers($('#txtCheckedBy'), '1,18'); //Prod Supervisor, Packing Operator
+        selectedItems = {};
+        updatePreShipmentTable();
+        $('#formPreshipment')[0].reset();
+        $('#formPreshipment').find('input[type="hidden"]').val('');
+        $('#modalPreShipment').modal('show');
 
-            if($('#txtFrmDataPreShipmentId').val() == ''){
-                $('#btnAddPreShipmentDetails').prop('disabled', true);
-                $('#btnAddPreShipmentDetails').prop('hidden', true);
-            }else{
-                $('#btnAddPreShipmentDetails').prop('disabled', false);
-                $('#btnAddPreShipmentDetails').prop('hidden', false);
-            }
-
-            $('#btnSavePreShipment').prop('hidden', false);
-
-            $('#btnRuncardDetails').prop('hidden', false);
-            $('#txtPONumber').prop('disabled', false);
-            $('#btnSubmitPreShipmentData').prop('hidden', true);
-
-            // GetMachineNo($('.SelMachineNo'), $('#txtSelectControlNumber').val());
-        }else{
-            toastr.error('Please Select Device Name')
-        }
+        // clark comment out button add preshipment details
+        // uncomment to enable hiding add details button when no preshipment id
+        // if($('#txtFrmDataPreShipmentId').val() == ''){
+        //     $('#btnAddPreShipmentDetails').prop('disabled', true);
+        //     $('#btnAddPreShipmentDetails').prop('hidden', true);
+        // }else{
+        //     $('#btnAddPreShipmentDetails').prop('disabled', false);
+        //     $('#btnAddPreShipmentDetails').prop('hidden', false);
+        // }
     });
 
     $('#btnSubmitPreShipmentData').on('click', function(e){
@@ -580,15 +568,27 @@ $(document).ready(function(){
         // Remove invalid & title validation
         $('div').find('input').removeClass('is-invalid');
         $("div").find('input').attr('title', '');
-        dtPreShipmentDetials.draw();
+        dtPreShipmentDetails.draw();
     });
 
+    // SAVE PRE-SHIPMENT DATA
     $('#btnSavePreShipment').click( function(e){
         e.preventDefault();
+        let formData = $('#formPreshipment').serializeArray();
+
+        formData.push({
+            name: 'items',
+            value: JSON.stringify(Object.values(selectedItems))
+        });
+
         $.ajax({
             type:"POST",
             url: "add_pre_shipment_data",
-            data: $('#formPreshipment').serialize(),
+            // data: $('#formPreshipment').serialize(),
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
             dataType: "json",
             success: function(response){
                 if(response['validation'] == 'hasError'){
@@ -643,9 +643,7 @@ $(document).ready(function(){
         });
     });
 
-    $(document).on('click', '.btnUpdatePreShipment',function(e){
-        e.preventDefault();
-        let PreShipmentId = $(this).attr('pre_shipment-id');
+    function GetPreShipmentData(PreShipmentId){
         $.ajax({
             url: "get_pre_shipment_data",
             type: "get",
@@ -656,46 +654,128 @@ $(document).ready(function(){
             beforeSend: function(){
             },
             success: function(response){
-                const PreShipmentData = response['pre_shipment_data'];
-
-                // CheckExistingStations(PreShipmentId, 'updating');
-                // CheckExistingSubStations(PreShipmentId);
+                const PreShipmentData = response['pre_shipment'];
+                const PreShipmentTransaction = response['transactions'];
 
                 $('#btnAddPreShipmentDetails').attr('preshipment_id', PreShipmentData.id);
                 $('#btnAddPreShipmentDetails').prop('hidden', false);
                 $('#btnAddPreShipmentDetails').prop('disabled', false);
                 $('#btnSubmitPreShipmentData').prop('hidden', false); //uncomment save button
 
-                // $('#btnRuncardDetails').prop('hidden', false);
-                // $('#txtPONumber').prop('disabled', false);
-                // $('#btnScanMaterialLot').prop('disabled', false);
-                // $('#btnScanContactLot').prop('disabled', false);
-                // $('#btnScanMELot').prop('disabled', false);
-                // $('#btnSubmitPreShipmentData').prop('hidden', true);
-                // $('#btnSavePreShipment').prop('hidden', false);
-                // $('#btnSavePreShipmentDetails').prop('hidden', false);
-                // GetPOFromPPSDB($('#txtPONumber'), $('#txtSelectControlNumber').val(), PreShipmentData.po_number);
-                // GetMachineNo($('.SelMachineNo'), $('#txtSelectControlNumber').val(), PreShipmentData.machine_no);
-
                 $('#formPreshipment #txtFrmDataPreShipmentId').val(PreShipmentData.id);
-                $('#formPreshipment #txtDate').val(PreShipmentData.date);
-                $('#formPreshipment #txtControlNo').val(PreShipmentData.control_no);
-                $('#formPreshipment #SelectSalesCutOff').val(PreShipmentData.sales_cutoff).trigger('change');
-                // $('#formPreshipment #txtDestination').val(PreShipmentData.destination);
-                $('#formPreshipment #txtSelectDestination').val(PreShipmentData.destination).trigger('change');
-                $('#formPreshipment #txtCategory').val(PreShipmentData.category);
-                $('#formPreshipment #txtStation').val(PreShipmentData.station);
-                $('#formPreshipment #txtShipmentDate').val(PreShipmentData.shipment_date);
+                $('#formPreshipment #txtDate').val(PreShipmentData.Date);
+                $('#formPreshipment #txtControlNo').val(PreShipmentData.Packing_List_CtrlNo);
 
-                dtPreShipmentDetials.draw();
-                $('#modalPreShipment').modal('show');
+                let categoryValue = '0';
+                if(PreShipmentData.Stamping == 1){
+                    categoryValue = 'stamping';
+                }else if(PreShipmentData.grinding == 1){
+                    categoryValue = 'grinding';
+                }else if(PreShipmentData.for_pps_cn_transfer == 1){
+                    categoryValue = 'for_pps_cn_transfer';
+                }
+
+                $('#formPreshipment #txtCategory').val(categoryValue);
+                $('#formPreshipment #txtSelectDestination').val(PreShipmentData.Destination).trigger('change');
+                $('#formPreshipment #txtStation').val(PreShipmentData.Station);
+                $('#formPreshipment #txtShipmentDate').val(PreShipmentData.Shipment_Date);
+                $('#formPreshipment #txtWeighedBy').val(PreShipmentTransaction[0].weighed_by).trigger('change');
+                $('#formPreshipment #txtPackedBy').val(PreShipmentTransaction[0].packed_by).trigger('change');
+                $('#formPreshipment #txtCheckedBy').val(PreShipmentTransaction[0].checked_by).trigger('change');
+
+                selectedItems = {}; // clear previous
+
+                $.each(PreShipmentTransaction, function(index, item){
+                    selectedItems[item.preshipdetails_id] = {
+                        id: item.preshipdetails_id,
+                        master_carton_no: item.master_carton_no,
+                        item_no: item.item_no,
+                        po_no: item.po_no,
+                        parts_code: item.parts_code,
+                        device_name: item.device_name,
+                        lot_no: item.lot_no,
+                        qty: item.qty,
+                        package_category: item.package_category,
+                        package_qty: item.package_qty,
+                        remarks: item.remarks
+                    };
+                });
+
+                updatePreShipmentTable();
+                // $('#formPreshipment #txtRemarks').val(PreShipmentData.remarks);
+                // $('#formPreshipment #txtMasterCartonNo').val(PreShipmentData.Master_CartonNo);
+                // $('#formPreshipment #txtItemNo').val(PreShipmentData.ItemNo);
+                // $('#formPreshipment #txtLotNo').val(PreShipmentData.LotNo);
+                // $('#formPreshipment #txtQuantity').val(PreShipmentData.Qty);
+                // $('#formPreshipment #txtPackageQty').val(PreShipmentData.PackageQty);
+
+                // $('#formPreshipment #txtPoNumber option').each(function () {
+                //     console.log('Option:', $(this).val());
+                // });
+
+                // dtPOSearchResult.draw(); //reload table to uncheck all
             },
             error: function(data, xhr, status){
                 toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
             }
-
         });
+    }
+
+    $(document).on('click', '.btnUpdatePreShipment',function(e){
+        e.preventDefault();
+        let PreShipmentId = $(this).attr('pre_shipment-id');
+        GetPreShipmentData(PreShipmentId);
+        $('#modalPreShipment').modal('show');
     });
+        // $.ajax({
+        //     url: "get_pre_shipment_data",
+        //     type: "get",
+        //     data: {
+        //         pre_shipment_id: PreShipmentId
+        //     },
+        //     dataType: "json",
+        //     beforeSend: function(){
+        //     },
+        //     success: function(response){
+        //         const PreShipmentData = response['pre_shipment_data'];
+
+                // $('#btnAddPreShipmentDetails').attr('preshipment_id', PreShipmentData.id);
+                // $('#btnAddPreShipmentDetails').prop('hidden', false);
+                // $('#btnAddPreShipmentDetails').prop('disabled', false);
+                // $('#btnSubmitPreShipmentData').prop('hidden', false); //uncomment save button
+
+                // $('#formPreshipment #txtFrmDataPreShipmentId').val(PreShipmentData.id);
+                // $('#formPreshipment #txtDate').val(PreShipmentData.Date);
+                // $('#formPreshipment #txtControlNo').val(PreShipmentData.Packing_List_CtrlNo);
+                // // $('#formPreshipment #SelectSalesCutOff').val(PreShipmentData.sales_cutoff).trigger('change');
+                // // $('#formPreshipment #txtDestination').val(PreShipmentData.destination);
+                // $('#formPreshipment #txtSelectDestination').val(PreShipmentData.Destination).trigger('change');
+
+                // let selectedValue = '0';
+
+                // if (PreShipmentData.Stamping == 1) {
+                //     selectedValue = 'stamping';
+                // } else if (PreShipmentData.grinding == 1) {
+                //     selectedValue = 'grinding';
+                // } else if (PreShipmentData.for_pps_cn_transfer == 1) {
+                //     selectedValue = 'for_pps_cn_transfer';
+                // }
+
+                // $('#formPreshipment #txtCategory').val(selectedValue);
+
+                // // $('#formPreshipment #txtCategory').val(PreShipmentData.category);
+                // $('#formPreshipment #txtStation').val(PreShipmentData.Station);
+                // $('#formPreshipment #txtShipmentDate').val(PreShipmentData.Shipment_Date);
+
+                // dtPreShipmentDetails.draw();
+                // dtPOSearchResult.draw();
+                // $('#modalPreShipment').modal('show');
+            // },
+            // error: function(data, xhr, status){
+            //     toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+            // }
+    //     });
+    // });
 
     $('#btnAddPreShipmentDetails').on('click', function(e){
         $('#modalAddPreShipmentDetails').modal('show');
@@ -775,6 +855,106 @@ $(document).ready(function(){
         }, 500));
     });
 
+    let selectedItems = {};
+    $(document).on('click', '#btnAddToListPreShipmentDetails',function(e){
+        e.preventDefault();
+        $('.itemCheckbox:checked').each(function () {
+            let id = $(this).data('checkbox-id');
+            let $row = $(this).closest('tr');
+
+            // build object from row inputs
+            let item = {
+                id: id,
+                master_carton_no: $row.find(`[data-master_carton-id="${id}"]`).val(),
+                item_no: $row.find(`[data-item_no-id="${id}"]`).val(),
+                lot_no: $row.find(`[data-lot_no-id="${id}"]`).val(),
+                qty: $row.find(`[data-quantity-id="${id}"]`).val(),
+                package_qty: $row.find(`[data-package_qty-id="${id}"]`).val(),
+                remarks: $row.find(`[data-remarks-id="${id}"]`).val(),
+
+                // optional fields from top of form
+                po_no: $('#txtPONumber').val(),
+                parts_code: $('#txtPartsCode').val(),
+                device_name: $('#txtDeviceName').val(),
+                package_category: $('#txtPackageCategory').val()
+            };
+
+            // ACCUMULATE (no duplicates)
+            if (!selectedItems[id]) {
+                selectedItems[id] = item;
+            }
+        });
+
+        updatePreShipmentTable();
+        $('#modalAddPreShipmentDetails').modal('hide');
+        // $.ajax({
+        //     type:"POST",
+        //     url: "add_preshipmt_details_data",
+        //     data: $('#formAddPreShipmentDetails').serialize(),
+        //     dataType: "json",
+        //     success: function(response){
+        //         if(response['result'] == 1){
+        //             toastr.success('Successful!');
+        //             $('#formPreshipment #txtShipmentOutput').val(response['shipment_output']);
+        //             $("#modalAddPreShipmentDetails").modal('hide');
+        //             dtPreShipmentDetails.draw();
+        //             // CheckExistingStations($('#txtPreShipmentId').val(), 'updating');
+        //             // CheckExistingSubStations($('#txtPreShipmentId').val(), 'updating');
+        //         }else{
+        //             toastr.error('Error!, Please Contanct ISS Local 208');
+        //         }
+        //     }
+        // });
+    });
+
+    function updatePreShipmentTable() {
+        let tbody = $('#tblPreShipmentList tbody');
+        tbody.empty(); // clear VIEW
+
+        // ✅ NO RECORDS
+        if (Object.keys(selectedItems).length === 0) {
+            tbody.append(`
+                <tr class="no-record">
+                    <td colspan="11" class="text-center text-muted">
+                        No records added
+                    </td>
+                </tr>
+            `);
+            return;
+        }
+
+        // ✅ HAS DATA
+        $.each(selectedItems, function (id, item) {
+            console.log('selectedItems', selectedItems);
+
+            tbody.append(`
+                <tr data-id="${id}" class="text-center">
+                    <td>${item.master_carton_no}</td>
+                    <td>${item.item_no}</td>
+                    <td>${item.po_no}</td>
+                    <td>${item.parts_code}</td>
+                    <td>${item.device_name}</td>
+                    <td>${item.lot_no}</td>
+                    <td>${item.qty}</td>
+                    <td>${item.package_category}</td>
+                    <td>${item.package_qty}</td>
+                    <td>${item.remarks ?? ''}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm btn-remove">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+        });
+    }
+
+    $("#tblPreShipmentList").on('click', '.btn-remove', function(){
+        let id = $(this).closest('tr').data('id');
+        delete selectedItems[id];
+        updatePreShipmentTable();
+    });
+
     $(document).on('click', '#btnSavePreShipmentDetails',function(e){
         e.preventDefault();
         $.ajax({
@@ -787,7 +967,7 @@ $(document).ready(function(){
                     toastr.success('Successful!');
                     $('#formPreshipment #txtShipmentOutput').val(response['shipment_output']);
                     $("#modalAddPreShipmentDetails").modal('hide');
-                    dtPreShipmentDetials.draw();
+                    dtPreShipmentDetails.draw();
                     // CheckExistingStations($('#txtPreShipmentId').val(), 'updating');
                     // CheckExistingSubStations($('#txtPreShipmentId').val(), 'updating');
                 }else{
@@ -839,63 +1019,63 @@ $(document).ready(function(){
         $("div").find('input').attr('title', '');
     });
 
-    function GetPreShipmentData(preShipmentId, preShipmentDetailsId){
-        $.ajax({
-            url: "get_pre_shipment_data",
-            type: "get",
-            data: {
-                pre_shipment_id: preShipmentId,
-                pre_shipment_details_id: preShipmentDetailsId
-            },
-            dataType: "json",
-            beforeSend: function(){
-            },
-            success: function(response){
-                const preshipment_details = response['pre_shipment_data'];
+    // function GetPreShipmentData(preShipmentId, preShipmentDetailsId){
+    //     $.ajax({
+    //         url: "get_pre_shipment_data",
+    //         type: "get",
+    //         data: {
+    //             pre_shipment_id: preShipmentId,
+    //             pre_shipment_details_id: preShipmentDetailsId
+    //         },
+    //         dataType: "json",
+    //         beforeSend: function(){
+    //         },
+    //         success: function(response){
+    //             const preshipment_details = response['pre_shipment_data'];
 
-                $('#formAddPreShipmentDetails #txtFrmDetailsPreShipmentId').val(preshipment_details.id);
-                $('#formAddPreShipmentDetails #txtPreShipmentDetailsId').val(preshipment_details.preshipdetails_id);
-                $('#formAddPreShipmentDetails #txtMasterCartonNo').val(preshipment_details.master_carton_no);
-                $('#formAddPreShipmentDetails #txtItemNo').val(preshipment_details.item_no);
-                $('#formAddPreShipmentDetails #txtPartsCode').val(preshipment_details.parts_code);
-                $('#formAddPreShipmentDetails #txtDeviceName').val(preshipment_details.device_name);
-                $('#formAddPreShipmentDetails #txtLotNo').val(preshipment_details.lot_no);
-                $('#formAddPreShipmentDetails #txtQuantity').val(preshipment_details.qty);
-                $('#formAddPreShipmentDetails #txtPackageCategory').val(preshipment_details.package_category);
-                $('#formAddPreShipmentDetails #txtPackageQty').val(preshipment_details.package_qty);
-                $('#formAddPreShipmentDetails #txtRemarks').val(preshipment_details.remarks);
+    //             $('#formAddPreShipmentDetails #txtFrmDetailsPreShipmentId').val(preshipment_details.id);
+    //             // $('#formAddPreShipmentDetails #txtPreShipmentDetailsId').val(preshipment_details.preshipdetails_id);
+    //             $('#formAddPreShipmentDetails #txtMasterCartonNo').val(preshipment_details.master_carton_no);
+    //             $('#formAddPreShipmentDetails #txtItemNo').val(preshipment_details.item_no);
+    //             $('#formAddPreShipmentDetails #txtPartsCode').val(preshipment_details.parts_code);
+    //             $('#formAddPreShipmentDetails #txtDeviceName').val(preshipment_details.device_name);
+    //             $('#formAddPreShipmentDetails #txtLotNo').val(preshipment_details.lot_no);
+    //             $('#formAddPreShipmentDetails #txtQuantity').val(preshipment_details.qty);
+    //             $('#formAddPreShipmentDetails #txtPackageCategory').val(preshipment_details.package_category);
+    //             $('#formAddPreShipmentDetails #txtPackageQty').val(preshipment_details.package_qty);
+    //             $('#formAddPreShipmentDetails #txtRemarks').val(preshipment_details.remarks);
 
-                // $('#formAddPreShipmentDetails #txtPoNumber').val(preshipment_details.po_no).trigger('change');
-                $('#formAddPreShipmentDetails #txtWeighedBy').val(preshipment_details.weighed_by).trigger('change');
-                $('#formAddPreShipmentDetails #txtPackedBy').val(preshipment_details.packed_by).trigger('change');
-                $('#formAddPreShipmentDetails #txtCheckedBy').val(preshipment_details.checked_by).trigger('change');
+    //             // $('#formAddPreShipmentDetails #txtPoNumber').val(preshipment_details.po_no).trigger('change');
+    //             $('#formAddPreShipmentDetails #txtWeighedBy').val(preshipment_details.weighed_by).trigger('change');
+    //             $('#formAddPreShipmentDetails #txtPackedBy').val(preshipment_details.packed_by).trigger('change');
+    //             $('#formAddPreShipmentDetails #txtCheckedBy').val(preshipment_details.checked_by).trigger('change');
 
-                $('#formAddPreShipmentDetails #txtPoNumber option').each(function () {
-                    console.log('Option:', $(this).val());
-                });
+    //             $('#formAddPreShipmentDetails #txtPoNumber option').each(function () {
+    //                 console.log('Option:', $(this).val());
+    //             });
 
-                getPOFromDeliveryUpdate($('#txtPoNumber'), preshipment_details.po_no);
-                dtPOSearchResult.draw(); //reload table to uncheck all
+    //             getPOFromDeliveryUpdate($('#txtPoNumber'), preshipment_details.po_no);
+    //             dtPOSearchResult.draw(); //reload table to uncheck all
 
-                // getPOFromDeliveryUpdate($('#formAddPreShipmentDetails #txtPoNumber'), function () {
-                //     // ✅ This runs ONLY AFTER the select is populated
-                //     $('#formAddPreShipmentDetails #txtPoNumber')
-                //         .val(preshipment_details.po_no)
-                //         .trigger('change');
-                // });
+    //             // getPOFromDeliveryUpdate($('#formAddPreShipmentDetails #txtPoNumber'), function () {
+    //             //     // ✅ This runs ONLY AFTER the select is populated
+    //             //     $('#formAddPreShipmentDetails #txtPoNumber')
+    //             //         .val(preshipment_details.po_no)
+    //             //         .trigger('change');
+    //             // });
 
-                // $('#formAddPreShipmentDetails #txtWeighedBy').val(preshipment_details.weighed_by_name);
-                // $('#formAddPreShipmentDetails #txtPackedBy').val(preshipment_details.packed_by_name);
-                // $('#formAddPreShipmentDetails #txtCheckedBy').val(preshipment_details.checked_by_name);
+    //             // $('#formAddPreShipmentDetails #txtWeighedBy').val(preshipment_details.weighed_by_name);
+    //             // $('#formAddPreShipmentDetails #txtPackedBy').val(preshipment_details.packed_by_name);
+    //             // $('#formAddPreShipmentDetails #txtCheckedBy').val(preshipment_details.checked_by_name);
 
-                // GetStations($('#txtSelectRuncardStation'), preshipment_details.station_step);
-                // GetSubStations($('#txtSelectRuncardSubStation'), preshipment_details.sub_station_step);
-            },
-            error: function(data, xhr, status){
-                toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
-            }
-        });
-    }
+    //             // GetStations($('#txtSelectRuncardStation'), preshipment_details.station_step);
+    //             // GetSubStations($('#txtSelectRuncardSubStation'), preshipment_details.sub_station_step);
+    //         },
+    //         error: function(data, xhr, status){
+    //             toastr.error('An error occured!\n' + 'Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+    //         }
+    //     });
+    // }
 
     $(document).on('click', '#btnPrintPreShipment', function(e){
         // e.preventDefault();
@@ -933,18 +1113,17 @@ $(document).ready(function(){
             }
 
             $("#formPrintPreShipmentQrCode").find("input, select, textarea").each(function(){
-                if ($(this).is("select")) {
+                if($(this).is("select")){
                     $(this).val("").trigger("change"); // Important for Select2
-                } else if ($(this).is(":checkbox") || $(this).is(":radio")) {
+                }else if ($(this).is(":checkbox") || $(this).is(":radio")) {
                     $(this).prop("checked", false);
-                } else if($(this).is(":date") && $(this).val() != ""){
+                }else if(this.type === "date" && $(this).val() != ""){
                     // If it's a date input and has a value, keep it
                     $(this).val($(this).val());
-                } else {
+                }else{
                     $(this).val("");
                 }
             });
-
         });
 
         $.ajax({
@@ -960,43 +1139,42 @@ $(document).ready(function(){
                 // getPoNoByPreShipId($('#txtPrintDeliveryKeyNo'), preshipment_details.id);
                 // getLotNoByPreShipId($('#txtPrintLotNo'), preshipment_details.id);
                 // getUsers($('#txtPrintPackedBy'), '0,1,2,3,4,5');
-                console.log('is_length', print_preship_details.length > 0);
+                // console.log('is_length', print_preship_details.length > 0);
 
-                if(print_preship_details.length > 0 && print_preship_details[0].po_no != null){
+                if(print_preship_details.length > 0 && print_preship_details[0].PONo != null){
                         result_po = '<option value="" disabled selected> Select PO No </option>';
                         result_lot_no = '<option value="" disabled selected> Select Lot No </option>';
                         result_packed_by = '<option value="" disabled selected> Select Packer </option>';
 
                     // Use a Set to track unique packed_by values
                     let uniquePackedByDetails = print_preship_details.filter((value, index, self) =>
-                        index === self.findIndex((item) => item.packed_by === value.packed_by)
+                        index === self.findIndex((item) => item.PackedBy === value.PackedBy)
                     );
 
                     let uniquePODetails = print_preship_details.filter((value, index, self) =>
-                        index === self.findIndex((item) => item.po_no === value.po_no)
+                        index === self.findIndex((item) => item.PONo === value.PONo)
                     );
 
                     let uniqueLotNoDetails = print_preship_details.filter((value, index, self) =>
-                        index === self.findIndex((item) => item.lot_no === value.lot_no)
+                        index === self.findIndex((item) => item.LotNo === value.LotNo)
                     );
 
                     for (let u = 0; u < uniquePackedByDetails.length; u++){
-                        result_packed_by += '<option name="'+uniquePackedByDetails[u].firstname+'" value="'+uniquePackedByDetails[u].packed_by+'">'+uniquePackedByDetails[u].packed_by_name+'</option>';
+                        result_packed_by += '<option name="'+uniquePackedByDetails[u].firstname+'" value="'+uniquePackedByDetails[u].PackedBy+'">'+uniquePackedByDetails[u].packed_by_name+'</option>';
                     }
 
                     for (let i = 0; i < uniquePODetails.length; i++){
-                            result_po += '<option device_name="'+uniquePODetails[i].device_name+'" parts_code="'+uniquePODetails[i].parts_code+'" value="'+uniquePODetails[i].po_no+'">'+uniquePODetails[i].po_no+'</option>';
-                        // if(uniquePODetails[i].lot_no != null){
-                            // result_lot_no += '<option value="'+uniquePODetails[i].lot_no+'">'+uniquePODetails[i].lot_no+'</option>';
+                            result_po += '<option device_name="'+uniquePODetails[i].device_name+'" parts_code="'+uniquePODetails[i].parts_code+'" value="'+uniquePODetails[i].PONo+'">'+uniquePODetails[i].PONo+'</option>';
+                        // if(uniquePODetails[i].LotNo != null){
+                            // result_lot_no += '<option value="'+uniquePODetails[i].LotNo+'">'+uniquePODetails[i].LotNo+'</option>';
                         // }
                     }
 
                     for (let i = 0; i < uniqueLotNoDetails.length; i++){
-                        if(uniqueLotNoDetails[i].lot_no != null){
-                            result_lot_no += '<option value="'+uniqueLotNoDetails[i].lot_no+'">'+uniqueLotNoDetails[i].lot_no+'</option>';
+                        if(uniqueLotNoDetails[i].LotNo != null){
+                            result_lot_no += '<option value="'+uniqueLotNoDetails[i].LotNo+'">'+uniqueLotNoDetails[i].LotNo+'</option>';
                         }
                     }
-
                 }else{
                     result_po = '<option value="0" selected disabled> -- No record found -- </option>';
                     result_lot_no = '<option value="0" selected disabled> -- No record found -- </option>';
@@ -1008,7 +1186,7 @@ $(document).ready(function(){
                 $('#txtPrintPackedBy').html(result_packed_by);
 
                 // $('#formPrintPreShipmentQrCode #txtPrintDeliveryKeyNo').val(preshipment_details.weighed_by).trigger('change');
-                // $('#formPrintPreShipmentQrCode #txtPrintLotNo').val(preshipment_details.packed_by).trigger('change');
+                // $('#formPrintPreShipmentQrCode #txtPrintLotNo').val(preshipment_details.PackedBy).trigger('change');
 
                 $('#formPrintPreShipmentQrCode #txtPrintShipmentDate').val(print_preship_details[0].preship_shipment_date);
                 // $('#formPrintPreShipmentQrCode #txtPrintDeliveryPlace').val(print_preship_details[0].preship_destination).trigger('change');

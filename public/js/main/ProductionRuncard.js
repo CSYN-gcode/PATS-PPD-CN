@@ -412,6 +412,9 @@ $(document).ready(function(){
 
                 $('#formProductionRuncard #txtShipmentOutput').val(prod_runcard_data[0].shipment_output);
 
+                // clark added for yield
+                $('#formProductionRuncard #txtComputedYield').val(prod_runcard_data[0].computed_yield);
+
                 $('#formProductionRuncard #txtPOQty').val(prod_runcard_data[0].po_quantity);
                 // $('#formProductionRuncard #txtRequiredOutput').val(prod_runcard_data[0].required_qty);
                 $('#formProductionRuncard #txtRequiredOutput').val($('#txtSearchReqOutput').val());
@@ -879,6 +882,9 @@ $(document).ready(function(){
 
                 $('#formProductionRuncard #txtShipmentOutput').val(prod_runcard_data[0].shipment_output);
 
+                // clark added for yield
+                $('#formProductionRuncard #txtComputedYield').val(station_data.computed_yield);
+
                 $('#formProductionRuncard #txtProductionLot').val(prod_runcard_data[0].production_lot);
                 $('#formProductionRuncard #txtDrawingNo').val(prod_runcard_data[0].drawing_no);
                 $('#formProductionRuncard #txtDrawingRev').val(prod_runcard_data[0].drawing_rev);
@@ -1182,6 +1188,7 @@ $(document).ready(function(){
                     if(response['result'] == 1){
                         toastr.success('Successful!');
                         $('#formProductionRuncard #txtShipmentOutput').val(response['shipment_output']);
+                        $('#formProductionRuncard #txtComputedYield').val(response['computed_yield']);
                         $("#modalAddStation").modal('hide');
                         dtProdRuncardStation.draw();
                         CheckExistingStations($('#txtFrmStationsRuncardId').val(), 'updating');
@@ -1416,11 +1423,11 @@ $(document).ready(function(){
                 $('#formAddProductionRuncardStation #txtStep').val(station_data.station_step);
                 $('#formAddProductionRuncardStation #txtSubStationStep').val(station_data.sub_station_step);
 
-                $('#formProductionRuncard #txtShipmentOutput').val(station_data.shipment_output);
+                // $('#formProductionRuncard #txtShipmentOutput').val(station_data.shipment_output);
 
-                // let computed_yield = station_data.shipment_output /
-
+                // console.log('test', station_data.computed_yield);
                 // $('#formProductionRuncard #txtComputedYield').val(station_data.computed_yield);
+                // console.log('test_val', $('#formProductionRuncard #txtComputedYield').val());
 
                 $('#formAddProductionRuncardStation #txtRemarks').val(station_data.station_remarks);
                 // $('#formAddProductionRuncardStation #txtMachineNo').val(station_data.station_plastic_injection_machine_no);

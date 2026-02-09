@@ -196,7 +196,7 @@
                         @csrf
                         <div class="modal-body">
                             <div class="row">
-                                <div class="col-sm-12 border px-4 mb-2">
+                                <div class="col-sm-4 border px-4">
                                     <div class="py-3">
                                         <span class="badge badge-secondary">1.</span> Pre-Shipment Details
                                     </div>
@@ -206,173 +206,123 @@
                                         </div>
                                         <input type="text" class="form-control form-control-sm" id="txtFrmDataPreShipmentId" name="pre_shipment_id" readonly>
                                     </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <div class="input-group input-group-sm mb-3">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">Date</span>
-                                                </div>
-                                                <input type="date" class="form-control form-control-sm" id="txtDate" name="date" value="{{ date('Y-m-d') }}" required>
-                                            </div>
-
-                                            <div class="input-group input-group-sm mb-3">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">Packing List Control No</span>
-                                                </div>
-                                                <input type="text" class="form-control form-control-sm" id="txtControlNo" name="control_no" readonly placeholder="Auto-Generated">
-                                            </div>
-
-                                            <div class="input-group input-group-sm mb-3">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">Category</span>
-                                                </div>
-                                                <select class="form-control" type="text" id="txtCategory" name="category">
-                                                    <option value="0" selected>N/A</option>
-                                                    <option value="stamping">Stamping</option>
-                                                    <option value="grinding">Grinding</option>
-                                                    <option value="for_pps_cn_transfer">For PPS-CN Transfer</option>
-                                                </select>
-                                            </div>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <div class="input-group-prepend w-50">
+                                            <span class="input-group-text w-100">Date</span>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <div class="input-group input-group-sm mb-3">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">Destination</span>
-                                                </div>
-                                                <select class="form-control select2bs5" type="text" id="txtSelectDestination" name="destination"></select>
-                                            </div>
-
-                                            <div class="input-group input-group-sm mb-3">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">Station</span>
-                                                </div>
-                                                <input type="text" class="form-control form-control-sm" id="txtStation" name="station" value="Packing">
-                                            </div>
-
-                                            <div class="input-group input-group-sm mb-3">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">Shipment Date</span>
-                                                </div>
-                                                <input type="date" class="form-control form-control-sm" id="txtShipmentDate" name="shipment_date" value="{{ date('Y-m-d') }}">
-                                            </div>
+                                        <input type="date" class="form-control form-control-sm" id="txtDate" name="date" value="{{ date('Y-m-d') }}" required>
+                                    </div>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <div class="input-group-prepend w-50">
+                                            <span class="input-group-text w-100">Packing List Control No</span>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <div class="input-group input-group-sm mb-3">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">Weighed By</span>
-                                                </div>
-                                                <select class="form-control form-control-sm select2bs5" type="text" id="txtWeighedBy" name="weighed_by" required></select>
-                                            </div>
-
-                                            <div class="input-group input-group-sm mb-3">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">Packed By</span>
-                                                </div>
-                                                <select class="form-control form-control-sm select2bs5" type="text" id="txtPackedBy" name="packed_by" required></select>
-                                            </div>
-
-                                            <div class="input-group input-group-sm mb-3">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">Checked By</span>
-                                                </div>
-                                                <select class="form-control form-control-sm select2bs5" type="text" id="txtCheckedBy" name="checked_by" required></select>
-                                            </div>
+                                        <input type="text" class="form-control form-control-sm" id="txtControlNo" name="control_no" readonly placeholder="Auto-Generated">
+                                    </div>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <div class="input-group-prepend w-50">
+                                            <span class="input-group-text w-100">Sales Cut-off</span>
                                         </div>
+                                        <select class="form-control" name="sales_cutoff" id="SelectSalesCutOff">
+                                            <option value="<?php echo date('m'); ?>" selected ><?php echo date('F'); ?></option><!-- selected -->
+                                            <option value="1">January</option>
+                                            <option value="2">February</option>
+                                            <option value="3">March</option>
+                                            <option value="4">April</option>
+                                            <option value="5">May</option>
+                                            <option value="6">June</option>
+                                            <option value="7">July</option>
+                                            <option value="8">August</option>
+                                            <option value="9">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="input-group input-group-sm mb-2">
+                                        <div class="input-group-prepend w-50">
+                                            <span class="input-group-text w-100">Category</span>
+                                        </div>
+                                        <select class="form-control" type="text" id="txtCategory" name="category">
+                                            <option value="" disabled selected>Select Category</option>
+                                            <option value="1">Stamping</option>
+                                            <option value="2">Grinding</option>
+                                            <option value="3">For PPS-CN Transfer</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="input-group input-group-sm mb-2">
+                                        <div class="input-group-prepend w-50">
+                                            <span class="input-group-text w-100">Destination</span>
+                                        </div>
+                                        <select class="form-control select2bs5" type="text" id="txtSelectDestination" name="destination"></select>
+                                        {{-- <select class="form-control select2bs5" type="text" id="txtDestination" name="destination"></select> --}}
+                                    </div>
+
+                                    <div class="input-group input-group-sm mb-2">
+                                        <div class="input-group-prepend w-50">
+                                            <span class="input-group-text w-100">Station</span>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm" id="txtStation" name="station" value="Packing">
+                                    </div>
+
+                                    <div class="input-group input-group-sm mb-2">
+                                        <div class="input-group-prepend w-50">
+                                            <span class="input-group-text w-100">Shipment Date</span>
+                                        </div>
+                                        <input type="date" class="form-control form-control-sm" id="txtShipmentDate" name="shipment_date" value="{{ date('Y-m-d') }}">
+                                    </div>
+
+                                    <div class="input-group input-group-sm mb-3 justify-content-end align-items-center">
+                                        <button class="btn btn-sm btn-success" type="button" id="btnSavePreShipment">
+                                            <i class="fa-solid fa-floppy-disk"></i> Save
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12 border px-4 border">
-                                    <div class="py-3">
-                                        <div style="float: left;">
-                                            <span class="badge badge-secondary">2.</span> PO Details
-                                        </div>
-
-                                        <div style="float: right;">
-                                            <button class="btn btn-primary" id="btnAddPreShipmentDetails" preshipment_id="" type="button" style="margin-bottom: 5px;">
-                                                <i class="fa fa-plus"></i> Add PO Details
-                                            </button>
-                                        </div>
-
-                                        {{-- Result of PO Search START --}}
-                                        <div class="table-responsive">
-                                            <table class="table table-sm table-bordered" id="tblPreShipmentList" style="width: 100%;">
-                                                <thead>
-                                                    <tr class="bg-light text-center">
-                                                        <th style="width: 10%;">Master Carton No</th>
-                                                        <th style="width: 5%;">Item No</th>
-                                                        <th style="width: 10%;">PO No</th>
-                                                        <th style="width: 10%;">Parts Code</th>
-                                                        <th style="width: 20%;">Device Name</th>
-                                                        <th style="width: 10%;">Lot No</th>
-                                                        <th style="width: 5%;">Qty</th>
-                                                        <th style="width: 10%;">Package Category</th>
-                                                        <th style="width: 10%;">Package Qty</th>
-                                                        <th style="width: 5%;">Remarks</th>
-                                                        <th style="width: 5%;">Remove</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        {{-- Result of PO Search END --}}
-
-                                        {{-- OLD CODE CLARK 01/19/2026 --}}
-                                        {{-- <div class="col-4">
-                                            <div class="input-group input-group-sm">
-                                                <div class="input-group-prepend w-50">
-                                                    <span class="input-group-text w-100">PO Number</span>
-                                                </div>
-                                                    <select class="form-control select2bs5" type="text" id="txtPONumber" name="po_number" required></select>
+                                <div class="col-sm-8">
+                                    <div class="col border px-4 border">
+                                        <div class="py-3">
+                                            <div style="float: left;">
+                                                <span class="badge badge-secondary">2.</span> Control Number Details
+                                            </div>
+                                            <div style="float: right;">
+                                                <button class="btn btn-primary btn-sm" id="btnAddPreShipmentDetails" preshipment_id="" type="button" style="margin-bottom: 5px;">
+                                                    <i class="fa fa-plus"></i> Add Details
+                                                </button>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm small table-bordered table-hover" id="tblPreShipmentDetails" style="width: 100%;">
+                                                    <thead>
+                                                        <tr class="bg-light">
+                                                            <th>Action</th>
+                                                            <th>Status</th>
+                                                            <th>Master Carton No</th>
+                                                            <th>Item No</th>
+                                                            <th>PO No</th>
+                                                            <th>Parts Code</th>
+                                                            <th>Device Name</th>
+                                                            <th>Lot No</th>
+                                                            <th>Qty</th>
+                                                            <th>Package Category</th>
+                                                            <th>Package Qty</th>
+                                                            <th>Weighed By</th>
+                                                            <th>Packed By</th>
+                                                            <th>Checked By</th>
+                                                            <th>Remarks</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-                                        <div style="float: right;">
-                                            <button class="btn btn-primary btn-sm" id="btnAddPreShipmentDetails" preshipment_id="" type="button" style="margin-bottom: 5px;">
-                                                <i class="fa fa-plus"></i> Add Details
-                                            </button>
-                                        </div>
-                                        <div class="table-responsive">
-                                            <table class="table table-sm small table-bordered table-hover" id="tblPreShipmentDetails" style="width: 100%;">
-                                                <thead>
-                                                    <tr class="bg-light">
-                                                        <th>Action</th>
-                                                        <th>Status</th>
-                                                        <th>Master Carton No</th>
-                                                        <th>Item No</th>
-                                                        <th>PO No</th>
-                                                        <th>Parts Code</th>
-                                                        <th>Device Name</th>
-                                                        <th>Lot No</th>
-                                                        <th>Qty</th>
-                                                        <th>Package Category</th>
-                                                        <th>Package Qty</th>
-                                                        <th>Weighed By</th>
-                                                        <th>Packed By</th>
-                                                        <th>Checked By</th>
-                                                        <th>Remarks</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </div> --}}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        {{-- SAVE BUTTON --}}
-                        {{-- <div class="input-group justify-content-end align-items-center mt-3">
-                            <button class="btn btn btn-success" type="button" id="btnSavePreShipment">
-                                <i class="fa-solid fa-floppy-disk"></i> Save Preshipment
-                            </button>
-                        </div> --}}
                         <div class="modal-footer justify-content-between">
                             <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
-                            <button class="btn btn btn-success" type="button" id="btnSavePreShipment">
-                                <i class="fa-solid fa-floppy-disk"></i> Save Preshipment
-                            </button>
+                            <button type="button" id="btnSubmitPreShipmentData" class="btn btn-primary"><i class="fa fa-check"></i> Submit</button>
                         </div>
                     </form>
                 </div>
@@ -432,9 +382,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                {{-- RIGHT SIDE --}}
-                                <div class="col-sm-6">
+
                                     <div class="row">
                                         <div class="col">
                                             <div class="input-group input-group-sm mb-3">
@@ -457,6 +405,52 @@
                                         </div>
                                     </div>
                                 </div>
+                                {{-- RIGHT SIDE --}}
+                                <div class="col-sm-6">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="input-group input-group-sm mb-3">
+                                                <div class="input-group-prepend w-50">
+                                                    <span class="input-group-text w-100">Weighed By</span>
+                                                </div>
+                                                <select class="form-control select2bs5" type="text" id="txtWeighedBy" name="weighed_by" required></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="input-group input-group-sm mb-3">
+                                                <div class="input-group-prepend w-50">
+                                                    <span class="input-group-text w-100">Packed By</span>
+                                                </div>
+                                                <select class="form-control select2bs5" type="text" id="txtPackedBy" name="packed_by" required></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="input-group input-group-sm mb-3">
+                                                <div class="input-group-prepend w-50">
+                                                    <span class="input-group-text w-100">Checked By</span>
+                                                </div>
+                                                <select class="form-control select2bs5" type="text" id="txtCheckedBy" name="checked_by" required></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="input-group input-group-sm mb-3">
+                                                <div class="input-group-prepend w-50">
+                                                    <span class="input-group-text w-100">Remarks</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-sm" id="txtRemarks" name="remarks">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             {{-- Result of PO Search START --}}
@@ -467,11 +461,11 @@
                                             <thead>
                                                 <tr class="bg-light">
                                                     <th style="width: 10%;"><center><input type="checkbox" style="width: 25px; height: 25px;" name="check_all" id="chkAllItems" disabled></center></th>
-                                                    <th style="width: 10%;">Master Carton No</th>
-                                                    <th style="width: 10%;">Item No</th>
-                                                    <th style="width: 20%;">Lot No</th>
+                                                    <th style="width: 15%;">Master Carton No</th>
+                                                    <th style="width: 20%;">Item No</th>
+                                                    <th style="width: 25%;">Lot No</th>
                                                     <th style="width: 10%;">Qty</th>
-                                                    {{-- <th style="width: 10%;">Package Category</th> --}}
+                                                    <th style="width: 10%;">Package Category</th>
                                                     <th style="width: 10%;">Package Qty</th>
                                                     <th style="width: 10%;">Remarks</th>
                                                     <th style="width: 10%;">Remove</th>
@@ -488,7 +482,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-success" id="btnAddToListPreShipmentDetails">Add To List</button>
+                        <button type="button" class="btn btn-success" id="btnSavePreShipmentDetails">Save</button>
                     </div>
                 </div>
             </div>
