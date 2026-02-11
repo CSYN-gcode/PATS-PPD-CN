@@ -883,7 +883,7 @@ $(document).ready(function(){
                 $('#formProductionRuncard #txtShipmentOutput').val(prod_runcard_data[0].shipment_output);
 
                 // clark added for yield
-                $('#formProductionRuncard #txtComputedYield').val(station_data.computed_yield);
+                $('#formProductionRuncard #txtComputedYield').val(prod_runcard_data[0].computed_yield);
 
                 $('#formProductionRuncard #txtProductionLot').val(prod_runcard_data[0].production_lot);
                 $('#formProductionRuncard #txtDrawingNo').val(prod_runcard_data[0].drawing_no);
