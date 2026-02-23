@@ -36,8 +36,9 @@
 					<!-- general form elements -->
 					<div>
 						{{-- <iframe  src="http://rapidx/OnlinePreShipmentPATS/iframe_request?username={{ Auth::user()->username }}&emp_id={{ Auth::user()->employee_id }}&iframe=export_report" style="border: none;" no-border height="850" width="100%"></iframe> --}}
-						<iframe  src="http://rapidx/OnlinePreShipmentPATS/iframe_request?iframe=1&username={{ Auth::user()->username }}&emp_id={{ Auth::user()->employee_id }}" style="border: none;" no-border height="850" width="100%"></iframe>
-					</div>
+						{{-- <iframe  src="http://rapidx/OnlinePreShipmentPATS/iframe_request?iframe=1&username={{ Auth::user()->username }}&emp_id={{ Auth::user()->employee_id }}" style="border: none;" no-border height="850" width="100%"></iframe> --}}
+						<iframe  src="http://rapidx/OnlinePreShipmentPATS/iframe_request?iframe=1&source=pats_ppd_cn&username={{ Auth::user()->username }}&emp_id={{ Auth::user()->employee_id }}" style="border: none;" no-border height="850" width="100%"></iframe>
+                    </div>
 				</div>
 			</div>
 			<!-- /.row -->
