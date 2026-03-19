@@ -277,7 +277,7 @@ class ProductionRuncardController extends Controller
 
     public function searchPoFromPpsDb(Request $request){
         $po_details = DB::connection('mysql_rapid_pps')
-        ->select(' SELECT po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS order_quantity, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev
+        ->select(' SELECT po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS order_quantity, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev, dieset.DieNo AS die_no
             FROM tbl_POReceived AS po_receive
             LEFT JOIN tbl_dieset AS dieset ON po_receive.ItemCode = dieset.R3Code
             WHERE po_receive.OrderNo = "'.$request->po_number.'" AND po_receive.ItemName = "'.$request->device_name.'"

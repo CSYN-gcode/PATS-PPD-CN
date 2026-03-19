@@ -521,6 +521,7 @@ $(document).ready(function(){
                     date = +'0'+date;
                 }
 
+                let die_no;
                 let rev_no;
                 let prod_lot;
                 let maintenance;
@@ -539,12 +540,14 @@ $(document).ready(function(){
                     let po_details = response['po_details'];
                     $("#formProductionRuncard #txtDrawingNo").val(po_details.drawing_no);
                     $("#formProductionRuncard #txtDrawingRev").val(po_details.drawing_rev);
+                    die_no = po_details.die_no;
                     rev_no = po_details.drawing_rev;
                 }else if (response['result'] == '2'){ //ACDCS
                     // toastr.error('Error, PO Number doesn`t match with the Device Name');
                     let doc_details = response['acdcs_data'];
                     $("#formProductionRuncard #txtDrawingNo").val(doc_details.doc_no);
                     $("#formProductionRuncard #txtDrawingRev").val(doc_details.rev_no);
+                    die_no = po_details.die_no;
                     rev_no = doc_details.rev_no;
                 }
                 // else if(response['result'] == '1'){
@@ -582,7 +585,7 @@ $(document).ready(function(){
                     production_lot_time = '';
                 }
 
-                prod_lot = rev_no + year + month + date + maintenance + production_lot_time;
+                prod_lot = die_no + rev_no + year + month + date + maintenance + production_lot_time;
                 if(mode === 'new'){
                     $("#formProductionRuncard #txtProductionLot").val(prod_lot);
                 }
