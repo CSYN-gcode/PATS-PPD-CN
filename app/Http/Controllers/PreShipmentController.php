@@ -330,7 +330,6 @@ class PreShipmentController extends Controller
                     }else{
                         $last_control_no = $lastest_id->control_no;
                         $last_control_no = explode("-", $last_control_no);
-                        // return $last_control_no;
                         if($last_control_no[0] == date('ym')){
                             $last_control_no = $last_control_no[1];
                             $counter = $last_control_no;

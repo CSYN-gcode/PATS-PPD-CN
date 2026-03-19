@@ -191,11 +191,11 @@
                         </li>
                     @endif
                     @if ( in_array(Auth::user()->position, [0,1,2,3,5,6,17,18]))
-                        <li class="nav-header mt-3"><strong>RAPIDX Pre-Shipment</strong></li>
+                        <li class="nav-header mt-3"><strong>RAPIDX MODULE</strong></li>
                         <li class="nav-item">
                             <a href="{{ route('rapidx_pre_shipment') }}" class="nav-link">
                                 <i class="fa-solid fa-qrcode"> </i>
-                                <p class="">Home</p>
+                                <p class="">PreShipment</p>
                             </a>
                         </li>
                     @endif

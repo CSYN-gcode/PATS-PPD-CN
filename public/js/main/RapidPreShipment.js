@@ -912,7 +912,7 @@ $(document).ready(function(){
         tbody.empty(); // clear VIEW
 
         // ✅ NO RECORDS
-        if (Object.keys(selectedItems).length === 0) {
+        if (Object.keys(selectedItems).length === 0){
             tbody.append(`
                 <tr class="no-record">
                     <td colspan="11" class="text-center text-muted">
