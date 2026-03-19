@@ -20,7 +20,7 @@ use QrCode;
 class DbPpsPreShipmentController extends Controller
 {
     public function getUsersByPos(Request $request){
-        $users = DB::connection('mysql')->select('SELECT id, CONCAT(firstname, " ", lastname) AS full_name FROM users WHERE position IN ('.$request->position.') AND status = 1');
+        $users = DB::connection('mysql')->select('SELECT id, firstname, CONCAT(firstname, " ", lastname) AS full_name FROM users WHERE position IN ('.$request->position.') AND status = 1');
         return response()->json(['users' => $users]);
     }
 
@@ -1121,7 +1121,6 @@ class DbPpsPreShipmentController extends Controller
                                     ->where('db_pps_preshipments.id', $request->preshipment_id)
                                     ->whereNull('db_pps_preshipments.deleted_at')
                                     ->first();
-        // return $data;
 
         $device_name = explode(" ",$data->device_name);
 
@@ -1134,7 +1133,7 @@ class DbPpsPreShipmentController extends Controller
                         WHERE `doc_type` = '".$request->doc_type."' AND `doc_title` LIKE '%".$device_name[0]."%' ORDER BY `rev_no` DESC"
                 );
 
-        return $acdcs_data;
+        // return $acdcs_data;
         // $op_names_array = [];
         // $operator_name_per_runcard = DB::table('db_pps_preship_transactions AS stations')
         //                             ->select(DB::raw("CONCAT(LEFT(users.firstname, 1), '.', users.lastname) AS operator_name"))

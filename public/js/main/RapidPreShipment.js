@@ -56,7 +56,7 @@ function GetControlNo(cboElement){
     });
 }
 
-const getUsers = (cboElement, position) => {
+const getUsers = (cboElement, position, userName = null) => {
     $.ajax({
         type: "get",
         url: "get_users_by_pos",
@@ -69,12 +69,17 @@ const getUsers = (cboElement, position) => {
             if(user_details.length > 0){
                     result = '<option value="" disabled selected> Select Name </option>';
                 for (let i = 0; i < user_details.length; i++) {
-                    result += '<option value="'+user_details[i].id+'">'+user_details[i].full_name+'</option>';
+                    result += '<option data-id="'+user_details[i].id+'" value="'+user_details[i].firstname+'">'+user_details[i].full_name+'</option>';
                 }
             }else{
                 result = '<option value="0" selected disabled> -- No record found -- </option>';
             }
+
             cboElement.html(result);
+
+            if(userName != null){
+                cboElement.val(userName).trigger('change');
+            }
         },
         error: function(data, xhr, status){
             result = '<option value="0" selected disabled> -- Reload Again -- </option>';
@@ -478,9 +483,9 @@ $(document).ready(function(){
     });
 
     $('#btnAddPreShipment').on('click', function(e){
-        getUsers($('#txtWeighedBy'), '1,18'); //Prod Supervisor, Packing Operator
-        getUsers($('#txtPackedBy'), '1,18');  //Prod Supervisor, Packing Operator
-        getUsers($('#txtCheckedBy'), '1,18'); //Prod Supervisor, Packing Operator
+        // getUsers($('#txtWeighedBy'), '1,18'); //Prod Supervisor, Packing Operator
+        // getUsers($('#txtPackedBy'), '1,18');  //Prod Supervisor, Packing Operator
+        // getUsers($('#txtCheckedBy'), '1,18'); //Prod Supervisor, Packing Operator
         selectedItems = {};
         updatePreShipmentTable();
         $('#formPreshipment')[0].reset();
@@ -679,9 +684,18 @@ $(document).ready(function(){
                 $('#formPreshipment #txtSelectDestination').val(PreShipmentData.Destination).trigger('change');
                 $('#formPreshipment #txtStation').val(PreShipmentData.Station);
                 $('#formPreshipment #txtShipmentDate').val(PreShipmentData.Shipment_Date);
-                $('#formPreshipment #txtWeighedBy').val(PreShipmentTransaction[0].weighed_by).trigger('change');
-                $('#formPreshipment #txtPackedBy').val(PreShipmentTransaction[0].packed_by).trigger('change');
-                $('#formPreshipment #txtCheckedBy').val(PreShipmentTransaction[0].checked_by).trigger('change');
+
+                // getUsers($('#txtWeighedBy'), '1,18', PreShipmentTransaction[0].weighed_by); //Prod Supervisor, Packing Operator
+                // getUsers($('#txtPackedBy'), '1,18', PreShipmentTransaction[0].packed_by); //Prod Supervisor, Packing Operator
+                // getUsers($('#txtCheckedBy'), '1,18', PreShipmentTransaction[0].checked_by); //Prod Supervisor, Packing Operator
+
+                // $('#formPreshipment #txtWeighedBy').val(PreShipmentTransaction[0].weighed_by).trigger('change');
+                // $('#formPreshipment #txtPackedBy').val(PreShipmentTransaction[0].packed_by).trigger('change');
+                // $('#formPreshipment #txtCheckedBy').val(PreShipmentTransaction[0].checked_by).trigger('change');
+
+                $('#formPreshipment #txtWeighedBy').val(PreShipmentTransaction[0].weighed_by);
+                $('#formPreshipment #txtPackedBy').val(PreShipmentTransaction[0].packed_by);
+                $('#formPreshipment #txtCheckedBy').val(PreShipmentTransaction[0].checked_by);
 
                 selectedItems = {}; // clear previous
 

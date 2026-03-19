@@ -262,21 +262,24 @@
                                                 <div class="input-group-prepend w-50">
                                                     <span class="input-group-text w-100">Weighed By</span>
                                                 </div>
-                                                <select class="form-control form-control-sm select2bs5" type="text" id="txtWeighedBy" name="weighed_by" required></select>
+                                                <input type="text" class="form-control form-control-sm" id="txtWeighedBy" name="weighed_by">
+                                                {{-- <select class="form-control form-control-sm select2bs5" type="text" id="txtWeighedBy" name="weighed_by" required></select> --}}
                                             </div>
 
                                             <div class="input-group input-group-sm mb-3">
                                                 <div class="input-group-prepend w-50">
                                                     <span class="input-group-text w-100">Packed By</span>
                                                 </div>
-                                                <select class="form-control form-control-sm select2bs5" type="text" id="txtPackedBy" name="packed_by" required></select>
+                                                <input type="text" class="form-control form-control-sm" id="txtPackedBy" name="packed_by" value="MHALOU">
+                                                {{-- <select class="form-control form-control-sm select2bs5" type="text" id="txtPackedBy" name="packed_by" required></select> --}}
                                             </div>
 
                                             <div class="input-group input-group-sm mb-3">
                                                 <div class="input-group-prepend w-50">
                                                     <span class="input-group-text w-100">Checked By</span>
                                                 </div>
-                                                <select class="form-control form-control-sm select2bs5" type="text" id="txtCheckedBy" name="checked_by" required></select>
+                                                <input type="text" class="form-control form-control-sm" id="txtCheckedBy" name="checked_by" value="Milly Laural">
+                                                {{-- <select class="form-control form-control-sm select2bs5" type="text" id="txtCheckedBy" name="checked_by" required></select> --}}
                                             </div>
                                         </div>
                                     </div>
