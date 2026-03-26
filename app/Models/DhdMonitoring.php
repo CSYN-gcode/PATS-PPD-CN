@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class DhdMonitoring extends Model
 {
     use HasFactory;
+
+    public function person_in_charge()
+    {
+    	return $this->hasOne(User::class, 'id', 'person_incharge');
+    }
 }

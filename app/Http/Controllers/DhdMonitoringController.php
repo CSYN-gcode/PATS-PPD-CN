@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use DataTables;
 use App\Models\DhdMonitoring;
+use App\Models\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,13 @@ class DhdMonitoringController extends Controller
 
         ->rawColumns(['action','dhd_number', 'total_mixed_mat_kgs'])
         ->make(true);
+    }
+
+    public function getQcInspectorName(Request $request){
+        date_default_timezone_set('Asia/Manila');
+
+        $user_details = User::where('status', 1)->whereIn('position', [2,5])->get();
+        return response()->json(['userDetails' => $user_details]);
     }
 
     public function add_dhd_monitoring(Request $request){
@@ -117,7 +125,7 @@ class DhdMonitoringController extends Controller
                     'dhd_bshift_mtl_level' => $request->dhd_bshift_mtl_level,
                     'dhd_bshift_time' => $request->dhd_bshift_time,
                     'person_incharge' => $request->person_incharge,
-                    'qc_inspector' => $request->remarks,
+                    'qc_inspector' => $request->qc_inspector,
                     'dhd_bshift_actual_temp' => $request->dhd_bshift_actual_temp,
                     'remarks' => $request->remarks,
 
@@ -148,7 +156,7 @@ class DhdMonitoringController extends Controller
     }
 
     public function get_dhd_monitoring(Request $request){
-        return DhdMonitoring::where('id', $request->id)->first();
+        return DhdMonitoring::with('person_in_charge')->where('id', $request->id)->first();
     }
 
 }

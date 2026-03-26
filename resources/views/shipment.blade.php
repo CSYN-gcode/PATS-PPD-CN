@@ -170,7 +170,8 @@
                                         <div class="input-group-prepend w-50">
                                             <span class="input-group-text w-100" id="basic-addon3">Sold To</span>
                                         </div>
-                                        <input type="text" class="form-control" name="sold_to" id="txtSoldTo" aria-describedby="basic-addon3">
+                                        <select class="form-control form-control-sm select2bs5 selectSoldTo" name="sold_to" id="txtSoldTo" ></select>
+                                        {{-- <input type="text" class="form-control selectSoldTo" name="sold_to" id="txtSoldTo" aria-describedby="basic-addon3"> --}}
                                     </div>
                                 </div>
 

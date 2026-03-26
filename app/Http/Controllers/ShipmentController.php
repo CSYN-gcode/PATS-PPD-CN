@@ -17,6 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 use App\Models\Shipment;
 use App\Models\ShipmentDetails;
+use App\Models\ShipmentSoldToList;
 
 class ShipmentController extends Controller
 {
@@ -163,6 +164,11 @@ class ShipmentController extends Controller
         }
     }
 
+    public function getSoldToList(Request $request){
+        $sold_to_list = ShipmentSoldToList::select('sold_to')->where('logdel', 0)->get();
+        return response()->json(['result' => 1, 'sold_to_list' => $sold_to_list]);
+    }
+
     public function getPOReceivedDetails(Request $request){
         $po_details = DB::connection('mysql_rapid_pps')->select("SELECT * FROM tbl_POReceived WHERE logdel = 0 AND POBalance > 0");
         return response()->json(['result' => 1, 'po_details' => $po_details]);
@@ -170,11 +176,12 @@ class ShipmentController extends Controller
 
     public function loadPreshipmentDetails (Request $request){
         if($request->ps_ctrl_number != ''){
-            // old code clark comment 01/27/2026
+
             preg_match('/^(.*?)-(\d+-\d+)$/', $request->ps_ctrl_number, $matches);
             $packingDestination = trim($matches[1]); // Extracted text part
             $packingListCtrlNo = $matches[2]; // Extracted numbers (with dash)
 
+            // old code clark comment 01/27/2026
             // $pre_shipment_details = DB::connection('mysql_rapid_pps')->select("SELECT
             // tbl_PreShipmentTransaction.PONo as order_no,
             // tbl_PreShipmentTransaction.Partscode as item_code,

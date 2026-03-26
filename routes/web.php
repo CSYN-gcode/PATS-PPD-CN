@@ -103,6 +103,7 @@ Route::post('/add_dhd_monitoring', [DhdMonitoringController::class,'add_dhd_moni
 Route::controller(DhdMonitoringController::class)->group(function () {
     Route::get('/view_dhd_monitoring', 'viewDhdMonitoring')->name('view_dhd_monitoring');
     Route::get('/get_dhd_monitoring', 'get_dhd_monitoring')->name('get_dhd_monitoring');
+    Route::get('/get_qc_inspector_name', 'getQcInspectorName')->name('get_qc_inspector_name');
 });
 
 /* MIMF */
@@ -351,6 +352,7 @@ Route::controller(ShipmentController::class)->group(function() {
     Route::get('/get_po_received_details', 'getPOReceivedDetails')->name('get_po_received_details');
     Route::get('/get_shipment_data', 'getShipmentData')->name('get_shipment_data');
     Route::get('/load_preshipment_details', 'loadPreshipmentDetails')->name('load_preshipment_details');
+    Route::get('/get_sold_to_list', 'getSoldToList')->name('get_sold_to_list');
 });
 
 /* PRESHIPMENT Controller */

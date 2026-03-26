@@ -67,7 +67,7 @@
                                 <div class="card-body"><!-- Start Page Content -->
                                     <div style="float: right;">
                                         <button class="btn btn-dark" data-bs-toggle="modal"
-                                            data-bs-target="#modalAddDHD" id="btnShowAddDevic"><i
+                                            data-bs-target="#modalAddDHD" id="btnShowAddDevice"><i
                                                 class="fa fa-initial-icon"></i> Add New Data</button>
                                     </div> <br><br>
                                     <div class="table-responsive">
@@ -123,11 +123,11 @@
                                                                     </div>
                                                                     <div class="col-sm-6">
                                                                         <label>Device Name</label>
-                                                                        <input type="text" class="form-control" name="device_name" placeholder="Dropdown" id="txtDeviceName">
+                                                                        <select class="form-control form-control-sm select2bs5 selectDeviceName" name="device_name" placeholder="Dropdown" id="txtDeviceName"></select>
                                                                     </div>
                                                                     <div class="col-sm-4">
                                                                         <label>Device Code</label>
-                                                                        <input type="text" class="form-control" name="device_code" id="txtDeviceCode" >
+                                                                        <input type="text" class="form-control" name="device_code" id="txtDeviceCode" readonly>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -143,7 +143,7 @@
                                                                 </div>
                                                                 <div class="row">
                                                                     <div class="col-sm-6">
-                                                                        <input type="text" class="form-control" name="mtl_name" placeholder="Dropdown" id="txtMaterialName">
+                                                                        <select class="form-control form-control-sm select2bs5 selectMaterialName" placeholder="Auto Generate" name="mtl_name" id="txtMaterialName"></select>
                                                                     </div>
                                                                     <div class="col-sm-3">
                                                                         <input type="text" class="form-control" name="mtl_lot_virgin" placeholder="(Virgin)" id="txtMaterialLotVirgin">
@@ -158,13 +158,13 @@
                                                                 <div class="row">
                                                                     <label>Material Mixing</label>
                                                                     <div class="col-sm-4">
-                                                                        <input type="text" class="form-control" name="mtl_mix_virgin" placeholder="(Virgin - Kgs.)" id="txtMaterialMixVirgin">
+                                                                        <input type="number" class="form-control" name="mtl_mix_virgin" placeholder="(Virgin - Kgs.)" id="txtMaterialMixVirgin">
                                                                     </div>
                                                                     <div class="col-sm-4">
-                                                                        <input type="text" class="form-control" name="mtl_mix_recycle" placeholder="(Recycle - Kgs.)" id="txtMaterialMixRecycle">
+                                                                        <input type="number" class="form-control" name="mtl_mix_recycle" placeholder="(Recycle - Kgs.)" id="txtMaterialMixRecycle">
                                                                     </div>
                                                                     <div class="col-sm-4">
-                                                                        <input type="text" class="form-control" name="mtl_ttl_mixing" placeholder="Total Mixed Mat'ls (Kgs.)" id="txtMaterialTotalMixing" >
+                                                                        <input type="number" class="form-control" name="mtl_ttl_mixing" placeholder="Total Mixed Mat'ls (Kgs.)" id="txtMaterialTotalMixing" readonly>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -187,10 +187,10 @@
                                                                         <input type="text" class="form-control" name="mtl_dry_actual" placeholder="Actual" id="txtMaterialDryActual">
                                                                     </div>
                                                                     <div class="col-sm-3">
-                                                                        <input type="text" class="form-control" name="mtl_dry_timeIn" placeholder="IN" id="txtMaterialDryTimeIn">
+                                                                        <input type="time" class="form-control" name="mtl_dry_timeIn" placeholder="IN" id="txtMaterialDryTimeIn">
                                                                     </div>
                                                                     <div class="col-sm-3">
-                                                                        <input type="text" class="form-control" name="mtl_dry_timeOut" placeholder="OUT" id="txtMaterialDryTimeOut">
+                                                                        <input type="time" class="form-control" name="mtl_dry_timeOut" placeholder="OUT" id="txtMaterialDryTimeOut">
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -233,19 +233,15 @@
                                                                     <div class="col-sm-6">
                                                                         <label>Person In-Charge</label>
                                                                         <div class="input-group">
-                                                                            <div class="input-group-prepend">
-                                                                                <button type="button" class="btn btn-primary btnSearchPoNo" title="Scan PO Code"><i class="fa fa-qrcode"></i></button>
-                                                                            </div>
-                                                                        <input type="text" class="form-control" name="person_incharge" placeholder="" id="txtPersonIncharge">
+                                                                            <input type="text" class="form-control" name="person_incharge" id="txtPersonInchargeId" value="{{ Auth::user()->id }}" hidden>
+                                                                            <input type="text" class="form-control" name="person_incharge_name" id="txtPersonIncharge" placeholder="Auto Generate" readonly>
                                                                         </div>
                                                                     </div>
+
                                                                     <div class="col-sm-6">
                                                                         <label>QC Inspector</label>
                                                                         <div class="input-group">
-                                                                            <div class="input-group-prepend">
-                                                                                <button type="button" class="btn btn-primary btnSearchPoNo" title="Scan PO Code"><i class="fa fa-qrcode"></i></button>
-                                                                            </div>
-                                                                        <input type="text" class="form-control" name="qc_inspector" placeholder="" id="txtQCInspector">
+                                                                            <select  class="form-control form-control-sm select2bs5 selectQcInspector" name="qc_inspector" id="txtQCInspector"></select>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -255,7 +251,7 @@
                                                                 <div class="row">
                                                                     <div class="col-sm-12">
                                                                         <label>Remarks</label>
-                                                                        <input type="text" class="form-control" name="remarks" placeholder="" id="txtRemarks">
+                                                                        <textarea class="form-control" name="remarks" placeholder="" id="txtRemarks"></textarea>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -305,6 +301,58 @@
                 $('.select2bs4').select2({
                     theme: 'bootstrap-5'
                 })
+
+                $('#btnShowAddDevice').click(function (e) {
+                    e.preventDefault();
+                    $('#formDHDMonitoring')[0].reset();
+                    $('.selectMaterialName').prop('disabled', true);
+                    $('.selectMaterialName').html('<option value="" disabled selected> Select Material Name </option>');
+                    getDeviceNameDropDownList($('.selectDeviceName'));
+                    getQcInspectorDropDownList($('.selectQcInspector'));
+                });
+
+                $('#txtDeviceName').on('change', function(e){
+                    let deviceName = $(this).val();
+                    let materialName = $(this).data('material');
+                    console.log('materialName', materialName);
+
+                    $.ajax({
+                        type: "get",
+                        url: "get_data_from_matrix",
+                        data: {
+                            "device_name" : deviceName
+                        },
+                        dataType: "json",
+                        beforeSend: function(){
+                        },
+                        success: function (response){
+                            let device_details = response['device_details'];
+                            let material_details = response['material_details'];
+                                material_details_arr = material_details.split(',');
+
+                            if(device_details == 0 && material_details == 0){
+                                toastr.error('No Process Found!, Please Insert Process');
+                            }else{
+                                $('#txtDeviceCode').val(device_details[0].code);
+                                $('.selectMaterialName').prop('disabled', false);
+                            }
+
+                            if(material_details_arr.length > 0) {
+                                    result = '<option value="" disabled selected> Select Material Name </option>';
+                                for(let index = 0; index < material_details_arr.length; index++){
+                                    result += '<option value="' + material_details_arr[index] + '">' + material_details_arr[index] + '</option>';
+                                }
+                            }else{
+                                result = '<option value="0" selected disabled> -- No record found -- </option>';
+                            }
+
+                            $('.selectMaterialName').html(result);
+                            if(materialName != null){
+                                $('.selectMaterialName').val(materialName).trigger('change');
+                            }
+                        }
+                    });
+                });
 
                 // ======================= START DATA TABLE =======================
                 dtDHDMonitoring = $("#tblDHDMonitoring").DataTable({
@@ -373,9 +421,9 @@
 
                             $('#txtDHDId').val(response['id']);
                             $('#txtDHDNo').val(response['dhd_no']);
-                            $('#txtDeviceName').val(response['device_name']);
+                            // $('#txtDeviceName').val(response['device_name']);
                             $('#txtDeviceCode').val(response['device_code']);
-                            $('#txtMaterialName').val(response['mtl_name']);
+                            // $('#txtMaterialName').val(response['mtl_name']);
                             $('#txtMaterialLotVirgin').val(response['mtl_lot_virgin']);
                             $('#txtMaterialLotRecycle').val(response['mtl_lot_recycle']);
                             $('#txtMaterialMixVirgin').val(response['mtl_mix_virgin']);
@@ -391,9 +439,14 @@
                             $('#txtDHDBActualTemp').val(response['dhd_bshift_actual_temp']);
                             $('#txtDHDBMtlLevel').val(response['dhd_bshift_mtl_level']);
                             $('#txtDHDBTime').val(response['dhd_bshift_time']);
-                            $('#txtPersonIncharge').val(response['person_incharge']);
-                            $('#txtQCInspector').val(response['qc_inspector']);
+                            $('#txtPersonInchargeId').val(response['person_incharge']);
+                            $('#txtPersonIncharge').val(response.person_in_charge.firstname+' '+response.person_in_charge.lastname);
+                            // $('#txtQCInspector').val(response['qc_inspector']);
                             $('#txtRemarks').val(response['remarks']);
+
+                            getDeviceNameDropDownList($('.selectDeviceName'), response['device_name'], response['mtl_name']);
+                            getQcInspectorDropDownList($('.selectQcInspector'), response['qc_inspector']);
+                            // $('#txtMaterialName').val(response['mtl_name']).trigger('change');
 
                             $('#modalAddDHD').modal('show');
 
@@ -401,9 +454,91 @@
                     });
                 });
 
-                $("#txtMaterialMixRecycle").keyup(function(){
-                    $("#txtMaterialTotalMixing").val(parseInt($("#txtMaterialMixVirgin").val()) + parseInt($(this).val()));
+                $('#txtMaterialMixVirgin, #txtMaterialMixRecycle').each(function(e){
+                    $(this).keyup(function (e) {
+                        let virgin = $("#txtMaterialMixVirgin").val();
+                        let recycle = $("#txtMaterialMixRecycle").val();
+
+                        if(virgin < 1){
+                            virgin = 0;
+                        }
+
+                        if(recycle < 1){
+                            recycle = 0;
+                        }
+
+                        $("#txtMaterialTotalMixing").val(parseInt(virgin) + parseInt(recycle));
+                    });
                 });
+
+                const getDeviceNameDropDownList = (cboElement, soldToName = null, materialName = null) => {
+                    let result = '<option value="" disabled selected> Select Device Name </option>';
+                    $.ajax({
+                        type: "get",
+                        url: "get_data_from_matrix",
+                        dataType: "json",
+                        beforeSend: function(){
+                            result = `<option value="0" selected disabled> - Loading - </option>`;
+                        },
+                        success: function (response) {
+                            let device_details = response['device_details'];
+                            if(device_details.length > 0) {
+                                    result = '<option value="" disabled selected> Select Device Name </option>';
+                                for (let index = 0; index < device_details.length; index++) {
+                                    result += '<option data-material value="' + device_details[index]['name'] + '">' + device_details[index]['name'] + '</option>';
+                                }
+                            }else{
+                                result = '<option value="0" selected disabled> -- No record found -- </option>';
+                            }
+                            cboElement.html(result);
+
+                            if(soldToName != null){
+                                cboElement.attr("data-material", materialName);
+                                cboElement.val(soldToName).trigger('change');
+                            }
+                        },
+                        error: function(data, xhr, status) {
+                            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+                            cboElement.html(result);
+                            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+                        }
+                    });
+                }
+
+                const getQcInspectorDropDownList = (cboElement, QcInspectorId = null) => {
+                    let result = '<option value="" disabled selected> Select QC Inspector </option>';
+                    $.ajax({
+                        method: "get",
+                        url: "get_qc_inspector_name",
+                        dataType: "json",
+                        beforeSend: function(){
+                            result = '<option value="" disabled selected>--Loading--</option>';
+                        },
+                        success: function (response){
+                            let qcInspector = response.userDetails;
+                            if(qcInspector.length > 0){
+                                    result = '<option value="" disabled selected> Select QC Inspector </option>';
+
+                                for (let i = 0; i < qcInspector.length; i++) {
+                                    result += '<option value="' + qcInspector[i]['id']+'" >' + qcInspector[i]['firstname'] +' '+qcInspector[i]['lastname'] + '</option>';
+                                }
+                            }else{
+                                result = '<option value="0" selected disabled> -- No record found -- </option>';
+                            }
+                            cboElement.html(result);
+
+                            if(QcInspectorId != null){
+                                cboElement.val(QcInspectorId).trigger('change');
+                            }
+                        },
+                        error: function(data, xhr, status) {
+                            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+                            cboElement.html(result);
+                            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+                        }
+                    });
+                }
+
             })
         </script>
     @endsection

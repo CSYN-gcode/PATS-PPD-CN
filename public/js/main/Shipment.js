@@ -1,3 +1,39 @@
+const getSoldToDropDownList = (cboElement, soldToName = null) => {
+    let result = '<option value="" disabled selected> Select Sold To </option>';
+    $.ajax({
+        type: "get",
+        url: "get_sold_to_list",
+        dataType: "json",
+        beforeSend: function(){
+            result = `<option value="0" selected disabled> - Loading - </option>`;
+        },
+        success: function (response) {
+            let sold_to_list = response['sold_to_list'];
+            if(sold_to_list.length > 0) {
+                    result = '<option value="" disabled selected> Select Sold To </option>';
+                for (let i = 0; i < sold_to_list.length; i++) {
+                    result += `<option value="${sold_to_list[i].sold_to}">${sold_to_list[i].sold_to}</option>`;
+                }
+            }else{
+                result = '<option value="0" selected disabled> -- No record found -- </option>';
+            }
+            cboElement.html(result);
+            // if(soldToName != null) {
+            //     $('.selectSoldTo').find('option[value="'+soldToName+'"]').attr('selected', 'selected');
+            // }
+
+            if(soldToName != null){
+                cboElement.val(soldToName).trigger('change');
+            }
+        },
+        error: function(data, xhr, status) {
+            result = '<option value="0" selected disabled> -- Reload Again -- </option>';
+            cboElement.html(result);
+            console.log('Data: ' + data + "\n" + "XHR: " + xhr + "\n" + "Status: " + status);
+        }
+    });
+}
+
 function AddShipmentData(){
     toastr.options = {
       "closeButton": false,
@@ -98,6 +134,18 @@ let dtShipmentDetailsTable;
 let ordersData = [];
 
 $(document).ready(function(){
+
+    // Apply Select2 to all select elements inside any modal dynamically
+    $('.modal').on('shown.bs.modal', function () {
+        $(this).find('.select2bs5').each(function() {
+            $(this).select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownParent: $(this).closest('.modal') // Ensures correct parent modal
+            });
+        });
+    });
+
     $(document).on('click', '#btnAddShipmentDetails', function(e){
 
         $("#txtOrderNo").on("input", function (){
@@ -233,6 +281,8 @@ $(document).ready(function(){
     });
 
     $('#modalAddShipmentData').on('shown.bs.modal', function () {
+        
+        getSoldToDropDownList($('.selectSoldTo'));
         // Fetch PO Received Details for datalist
         $.ajax({
             url: "get_po_received_details", // Replace with your API URL
