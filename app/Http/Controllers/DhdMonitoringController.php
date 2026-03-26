@@ -17,6 +17,25 @@ class DhdMonitoringController extends Controller
         $dhd_details = DhdMonitoring::where('logdel', 0)->get();
         // return $dhd_details;
         return DataTables::of($dhd_details)
+        ->addColumn('created_at_date', function ($dhd_details) {
+            $result = $dhd_details->created_at;
+            $formatted = date("M j, Y g:i A", strtotime($result));
+            return $formatted;
+        })
+        ->addColumn('mtl_dry_timeIn_label', function ($dhd_details) {
+            $result = $dhd_details->mtl_dry_timeIn;
+            if($result == null){
+                $result = 'N/A';
+            }
+            return $result;
+        })
+        ->addColumn('mtl_dry_timeOut_label', function ($dhd_details) {
+            $result = $dhd_details->mtl_dry_timeOut;
+            if($result == null){
+                $result = 'N/A';
+            }
+            return $result;
+        })
         ->addColumn('action', function($dhd_details){
             $result = "<center>";
             $result .= "<button class='btn btn-primary btn-sm btnEdit mr-1' data-id='$dhd_details->id'><i class='fa-solid fa-pen-to-square'></i></button>";
@@ -37,7 +56,7 @@ class DhdMonitoringController extends Controller
             return $result;
         })
 
-        ->rawColumns(['action','dhd_number', 'total_mixed_mat_kgs'])
+        ->rawColumns(['action', 'created_at_date', 'dhd_number', 'total_mixed_mat_kgs', 'mtl_dry_timeIn_label', 'mtl_dry_timeOut_label'])
         ->make(true);
     }
 

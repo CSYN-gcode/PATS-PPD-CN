@@ -119,7 +119,7 @@
                                                                 <div class="row">
                                                                     <div class="col-sm-2">
                                                                         <label>DHD No.</label>
-                                                                        <input type="text" class="form-control" name="dhd_no" id="txtDHDNo">
+                                                                        <input type="number" class="form-control" name="dhd_no" id="txtDHDNo">
                                                                     </div>
                                                                     <div class="col-sm-6">
                                                                         <label>Device Name</label>
@@ -181,10 +181,10 @@
                                                                 </div>
                                                                 <div class="row">
                                                                     <div class="col-sm-3">
-                                                                        <input type="text" class="form-control" name="mtl_dry_setting" placeholder="Setting" id="txtMaterialDrySetting">
+                                                                        <input type="number" class="form-control" name="mtl_dry_setting" placeholder="Setting" id="txtMaterialDrySetting">
                                                                     </div>
                                                                     <div class="col-sm-3">
-                                                                        <input type="text" class="form-control" name="mtl_dry_actual" placeholder="Actual" id="txtMaterialDryActual">
+                                                                        <input type="number" class="form-control" name="mtl_dry_actual" placeholder="Actual" id="txtMaterialDryActual">
                                                                     </div>
                                                                     <div class="col-sm-3">
                                                                         <input type="time" class="form-control" name="mtl_dry_timeIn" placeholder="IN" id="txtMaterialDryTimeIn">
@@ -207,22 +207,22 @@
                                                                 </div>
                                                                 <div class="row">
                                                                     <div class="col-sm-2">
-                                                                        <input type="text" class="form-control" name="dhd_ashift_actual_temp" placeholder="Act Temp" id="txtDHDAActualTemp">
+                                                                        <input type="number" class="form-control" name="dhd_ashift_actual_temp" placeholder="Act Temp" id="txtDHDAActualTemp">
                                                                     </div>
                                                                     <div class="col-sm-2">
-                                                                        <input type="text" class="form-control" name="dhd_ashift_mtl_level" placeholder="Mtl Level" id="txtDHDAMtlLevel">
+                                                                        <input type="number" class="form-control" name="dhd_ashift_mtl_level" placeholder="Mtl Level" id="txtDHDAMtlLevel">
                                                                     </div>
                                                                     <div class="col-sm-2">
-                                                                        <input type="text" class="form-control" name="dhd_ashift_time" placeholder="Time" id="txtDHDATime">
+                                                                        <input type="time" class="form-control" name="dhd_ashift_time" placeholder="Time" id="txtDHDATime">
                                                                     </div>
                                                                     <div class="col-sm-2">
-                                                                        <input type="text" class="form-control" name="dhd_bshift_actual_temp" placeholder="Act Temp" id="txtDHDBActualTemp">
+                                                                        <input type="number" class="form-control" name="dhd_bshift_actual_temp" placeholder="Act Temp" id="txtDHDBActualTemp">
                                                                     </div>
                                                                     <div class="col-sm-2">
-                                                                        <input type="text" class="form-control" name="dhd_bshift_mtl_level" placeholder="Mtl Level" id="txtDHDBMtlLevel">
+                                                                        <input type="number" class="form-control" name="dhd_bshift_mtl_level" placeholder="Mtl Level" id="txtDHDBMtlLevel">
                                                                     </div>
                                                                     <div class="col-sm-2">
-                                                                        <input type="text" class="form-control" name="dhd_bshift_time" placeholder="Time" id="txtDHDBTime">
+                                                                        <input type="time" class="form-control" name="dhd_bshift_time" placeholder="Time" id="txtDHDBTime">
                                                                     </div>
 
                                                                 </div>
@@ -367,20 +367,20 @@
                     },
                     "columns":[
                         { "data" : "action", orderable:false, searchable:false },
-                        { "data" : "created_by" },
-                        { "data" : "dhd_number" },
+                        { "data" : "created_at_date" },
+                        { "data" : "dhd_no" },
                         { "data" : "device_code" },
                         { "data" : "device_name" },
                         { "data" : "mtl_name" },
                         { "data" : "mtl_mix_virgin" },
                         { "data" : "mtl_mix_recycle" },
-                        { "data" : "total_mixed_mat_kgs" },
+                        { "data" : "mtl_ttl_mixing" },
                         { "data" : "mtl_lot_virgin" },
                         { "data" : "mtl_lot_recycle" },
                         { "data" : "mtl_dry_setting" },
                         { "data" : "mtl_dry_actual" },
-                        { "data" : "mtl_dry_timeIn" },
-                        { "data" : "mtl_dry_timeOut" },
+                        { "data" : "mtl_dry_timeIn_label" },
+                        { "data" : "mtl_dry_timeOut_label" },
                         { "data" : "dhd_ashift_actual_temp" },
                         { "data" : "dhd_bshift_actual_temp" },
                     ],
