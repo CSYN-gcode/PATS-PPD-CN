@@ -210,7 +210,7 @@
                                                                         <input type="number" class="form-control" name="dhd_ashift_actual_temp" placeholder="Act Temp" id="txtDHDAActualTemp">
                                                                     </div>
                                                                     <div class="col-sm-2">
-                                                                        <input type="number" class="form-control" name="dhd_ashift_mtl_level" placeholder="Mtl Level" id="txtDHDAMtlLevel">
+                                                                        <input type="text" class="form-control" name="dhd_ashift_mtl_level" placeholder="Mtl Level" id="txtDHDAMtlLevel">
                                                                     </div>
                                                                     <div class="col-sm-2">
                                                                         <input type="time" class="form-control" name="dhd_ashift_time" placeholder="Time" id="txtDHDATime">
@@ -219,7 +219,7 @@
                                                                         <input type="number" class="form-control" name="dhd_bshift_actual_temp" placeholder="Act Temp" id="txtDHDBActualTemp">
                                                                     </div>
                                                                     <div class="col-sm-2">
-                                                                        <input type="number" class="form-control" name="dhd_bshift_mtl_level" placeholder="Mtl Level" id="txtDHDBMtlLevel">
+                                                                        <input type="text" class="form-control" name="dhd_bshift_mtl_level" placeholder="Mtl Level" id="txtDHDBMtlLevel">
                                                                     </div>
                                                                     <div class="col-sm-2">
                                                                         <input type="time" class="form-control" name="dhd_bshift_time" placeholder="Time" id="txtDHDBTime">
