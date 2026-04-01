@@ -252,7 +252,8 @@ $(document).ready(function(){
                             }else if(PoNumber == po_details[index]['po_number']){
                                 isDisabled = '';
                             }else{
-                                isDisabled = 'disabled';
+                                // isDisabled = 'disabled'; //clark comment 04/01/2026 until PO received is updated
+                                isDisabled = '';
                             }
                             result += '<option '+isDisabled+' value="' + po_details[index]['po_number'] + '">' + po_details[index]['po_number'] + '</option>';
                         }
