@@ -261,59 +261,27 @@ class ProductionRuncardController extends Controller
     }
 
     public function GetPOFromPPSDB(Request $request){
-        //old code for reference
-        // if(isset($request->po_number)){
-        //     $andWhere = '';
-        // }else{
-        //     $andWhere = 'AND po_receive.POBalance > 0';
-        // }
-        if (isset($request->po_number)) {
-            $andWhere = 'AND (po_receive.POBalance > 0 OR po_receive.OrderNo = "'.$request->po_number.'")';
-        } else {
+        if(isset($request->po_number)){
+            $andWhere = '';
+        }else{
             $andWhere = 'AND po_receive.POBalance > 0';
         }
 
-        $po_details = DB::connection('mysql_rapid_pps')->select(' SELECT po_receive.OrderNo AS po_number, po_receive.OrderQty AS order_quantity, po_receive.POBalance AS po_quantity, po_receive.DateIssued AS received_date
+        $po_details = DB::connection('mysql_rapid_pps')->select(' SELECT po_receive.ItemName AS part_name, po_receive.OrderNo AS po_number, po_receive.POBalance AS po_quantity, po_receive.DateIssued AS received_date
                             FROM tbl_POReceived AS po_receive
                             WHERE po_receive.ItemName = "'.$request->device_name.'"'.$andWhere.' ORDER BY po_receive.DateIssued ASC;
         ');
 
-        for($i = 0; $i < count($po_details); $i++){
-            $po_output = DB::table('production_runcards AS runcard')
-                        ->select(DB::raw('SUM(runcard.shipment_output) as accume_ttl_output'))
-                        ->where('runcard.po_number', $po_details[$i]->po_number)
-                        ->whereNull('runcard.deleted_at')
-                        ->first();
-
-            if($po_output->accume_ttl_output < $po_details[$i]->order_quantity){
-                $oldest_po_pats = $po_details[$i]->po_number;
-                $oldest_po_index = $i;
-                break; // 🔥 stops the loop immediately
-            }
-        }
-
-        // $oldest_po_pats = DB::table('production_runcards AS runcard')
-        //                         ->select(DB::raw('SUM(runcard.shipment_output) as accume_ttl_output'))
-        //                         ->where('runcard.po_number', $po_details[0]->po_number)
-        //                         ->whereNull('runcard.deleted_at')
-        //                         ->first();
-
-        // if($oldest_po_pats->accume_ttl_output == $po_details[0]->order_quantity){
-        //     'PO BALANCE 0';
-        // }else{
-        //     'Goods';
-        // }
-
-        return response()->json(['result' => 1, 'po_details' => $po_details, 'oldest_po_pats' => $oldest_po_pats, 'oldest_po_index' => $oldest_po_index]);
+        return response()->json(['result' => 1, 'po_details' => $po_details]);
     }
 
     public function searchPoFromPpsDb(Request $request){
         $po_details = DB::connection('mysql_rapid_pps')
-                        ->select(' SELECT po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS order_quantity, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev, dieset.DieNo AS die_no
-                            FROM tbl_POReceived AS po_receive
-                            LEFT JOIN tbl_dieset AS dieset ON po_receive.ItemCode = dieset.R3Code
-                            WHERE po_receive.OrderNo = "'.$request->po_number.'" AND po_receive.ItemName = "'.$request->device_name.'"
-                        ');
+        ->select(' SELECT po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS order_quantity, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev, dieset.DieNo AS die_no
+            FROM tbl_POReceived AS po_receive
+            LEFT JOIN tbl_dieset AS dieset ON po_receive.ItemCode = dieset.R3Code
+            WHERE po_receive.OrderNo = "'.$request->po_number.'" AND po_receive.ItemName = "'.$request->device_name.'"
+            ');
 
         $po_tll_output = DB::table('production_runcards AS runcard')
                         ->select(DB::raw('SUM(runcard.shipment_output) as accume_ttl_output'))

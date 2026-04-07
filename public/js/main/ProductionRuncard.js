@@ -224,7 +224,7 @@ $(document).ready(function(){
         }
     });
 
-    function GetPOFromPPSDB(cboElement, device_name, PoNumber = null, mode = null){
+    function GetPOFromPPSDB(cboElement, device_name, PoNumber = null){
         let result = '<option value="" disabled selected> Select PO Number (Old -> New) </option>';
         $.ajax({
             method: "get",
@@ -239,22 +239,11 @@ $(document).ready(function(){
             },
             success: function (response) {
                 let po_details = response['po_details'];
-                let oldest_po_index = response['oldest_po_index'];
-                let oldest_po_pats = response['oldest_po_pats'];
-                let isDisabled = '';
-
                 if(po_details.length > 0) {
-                        result = '<option value="" disabled selected> Select PO No. (Oldest -> Newest) </option>';
+                        result = '<option value="" disabled selected> Select PO No. (Oldest - Newest) </option>';
                     for (let index = 0; index < po_details.length; index++) {
                         if(po_details[index]['po_number'] == PoNumber || po_details[index]['po_quantity'] > 0){
-                            if(index <= oldest_po_index || oldest_po_pats == po_details[index]['po_number']){
-                                isDisabled = '';
-                            }else if(PoNumber == po_details[index]['po_number']){
-                                isDisabled = '';
-                            }else{
-                                isDisabled = 'disabled';
-                            }
-                            result += '<option '+isDisabled+' value="' + po_details[index]['po_number'] + '">' + po_details[index]['po_number'] + '</option>';
+                            result += '<option value="' + po_details[index]['po_number'] + '">' + po_details[index]['po_number'] + '</option>';
                         }
                     }
                 }else{
@@ -262,12 +251,7 @@ $(document).ready(function(){
                 }
                 cboElement.html(result);
                 if(PoNumber != null){
-                    // if(mode == 'viewing'){
-                    //     mode
-                    // }else{
-
-                    // }
-                    cboElement.val(PoNumber).trigger('change', [mode]);
+                    cboElement.val(PoNumber).trigger('change', ['edit']);
                     // GetPPSDBDataByPO(PoNumber, device_name, 1);
                 }
             },
@@ -413,7 +397,7 @@ $(document).ready(function(){
                 $('#formProductionRuncard #txtPartCode').val(prod_runcard_data[0].part_code);
                 // $('#formProductionRuncard #txtPONumber').val(prod_runcard_data[0].po_number);
                 // $('#formProductionRuncard #txtPONumber').val(prod_runcard_data[0].po_number).trigger('change');
-                GetPOFromPPSDB($('#txtPONumber'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].po_number, 'view');
+                GetPOFromPPSDB($('#txtPONumber'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].po_number);
                 GetMachineNo($('.SelMachineNo'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].machine_no);
 
                 // console.log('production lot lenght',prod_runcard_data[0].production_lot.length);
@@ -461,7 +445,6 @@ $(document).ready(function(){
         // $('#btnScanMaterialLot').prop('disabled', true);
         // $('#btnScanContactLot').prop('disabled', true);
         // $('#btnScanMELot').prop('disabled', true);
-        $('#txtPONumber').prop('disabled', true);
         $('#btnSaveRuncardDetails').prop('hidden', true);
         $('#btnAddRuncardStation').prop('hidden', true);
         $('#btnAddRuncardStation').prop('disabled', true);
@@ -480,20 +463,35 @@ $(document).ready(function(){
         }
     }
 
-    $('#formProductionRuncard #txtPONumber').change(delay(function(e, mode){
-        mode = mode || 'new'; // default
+    // $('#formProductionRuncard #txtPONumber').keyup(delay(function(e){
+    // $('#formProductionRuncard #txtPONumber').click(function(e){
+        // console.log('change po click true');
+    // $("#formProductionRuncard #txtPONumber").focus(function(){
+        // console.log('focus true');
+        $('#formProductionRuncard #txtPONumber').change(delay(function(e, triggerMode){
+                // console.log('change po test true');
+            console.log('nag run dito 1');
+            let mode = 'new'; // default
+            mode = triggerMode || 'new';
 
-        // let po_number = $(this).val();
-        console.log('po_number', $(this).val());
-        console.log('mode', mode);
+            if (mode === 'new') {
+                console.log('User selected manually → NEW mode');
+                // Your logic for new mode
+            } else if (mode === 'edit') {
+                console.log('Triggered via AJAX → EDIT mode');
+                // Your logic for edit mode
+            }
 
-
-        let device_name = $('#formProductionRuncard').find('#txtPartName').val();
-        // if(po_number != ''){
-            GetPPSDBDataByPO($(this).val(), device_name, mode);
-            $("#formProductionRuncard #txtNewlyMaintenance").prop('disabled', false);
-        // }
-    }, 300));
+            let po_number = $(this).val();
+            let device_name = $('#formProductionRuncard').find('#txtPartName').val();
+            // let current_value = '0';
+            if(po_number != ''){
+                GetPPSDBDataByPO(po_number, device_name, mode);
+                $("#formProductionRuncard #txtNewlyMaintenance").prop('disabled', false);
+            }
+        }, 300));
+    // });
+    // });
 
     function GetPPSDBDataByPO(po_number, device_name, mode){
         $.ajax({
@@ -528,10 +526,8 @@ $(document).ready(function(){
                 let prod_lot;
                 let maintenance;
                 let production_lot_time;
-                let po_details = response['po_details'];
-                let doc_details = response['acdcs_data'];
-
                 if(response['result'] != '0'){
+                    let po_details = response['po_details'];
                     $("#formProductionRuncard #txtPartName").val(po_details.part_name);
                     $("#formProductionRuncard #txtPartCode").val(po_details.part_code);
                     $("#formProductionRuncard #txtPONumber").val(po_details.po_number);
@@ -540,15 +536,42 @@ $(document).ready(function(){
                 }
 
                 if(response['result'] == '1'){ //RAPID PO RECEIVE & DIESET
+                    // console.log('true');
+                    let po_details = response['po_details'];
                     $("#formProductionRuncard #txtDrawingNo").val(po_details.drawing_no);
                     $("#formProductionRuncard #txtDrawingRev").val(po_details.drawing_rev);
+                    die_no = po_details.die_no;
                     rev_no = po_details.drawing_rev;
                 }else if (response['result'] == '2'){ //ACDCS
+                    // toastr.error('Error, PO Number doesn`t match with the Device Name');
+                    let doc_details = response['acdcs_data'];
                     $("#formProductionRuncard #txtDrawingNo").val(doc_details.doc_no);
                     $("#formProductionRuncard #txtDrawingRev").val(doc_details.rev_no);
+                    die_no = po_details.die_no;
                     rev_no = doc_details.rev_no;
                 }
-                    die_no = po_details.die_no > 0 ? po_details.die_no : '';
+                // else if(response['result'] == '1'){
+                //     // console.log('true');
+                //     let po_details = response['po_details'];
+                //     $("#formProductionRuncard #txtDrawingNo").val(po_details.drawing_no);
+                //     $("#formProductionRuncard #txtDrawingRev").val(po_details.drawing_rev);
+                //     rev_no = po_details.drawing_rev;
+                // }
+
+                //old 01/17/2025
+                // else if(response['result'] == '0'){
+                //     console.log('true');
+                //     let po_details = response['po_details'];
+                //     $("#formProductionRuncard #txtDrawingNo").val(po_details.drawing_no);
+                //     $("#formProductionRuncard #txtDrawingRev").val(po_details.drawing_rev);
+                //     rev_no = po_details.drawing_rev;
+                // }else{
+                //     let doc_details = response['acdcs_data'];
+
+                //     $("#formProductionRuncard #txtDrawingNo").val(doc_details.doc_no);
+                //     $("#formProductionRuncard #txtDrawingRev").val(doc_details.rev_no);
+                //     rev_no = doc_details.rev_no;
+                // }
 
                 if($('#formProductionRuncard #txtNewlyMaintenance').prop('checked') == true){
                     maintenance = '-M';
@@ -565,15 +588,6 @@ $(document).ready(function(){
                 prod_lot = die_no + rev_no + year + month + date + maintenance + production_lot_time;
                 if(mode === 'new'){
                     $("#formProductionRuncard #txtProductionLot").val(prod_lot);
-                }
-
-                if(response['po_balance'] <= 0 && mode !== 'view'){
-                    toastr.warning('PO Balance is 0, Please select the next PO Number');
-                    $('#btnSaveRuncardDetails').prop('hidden', true);
-                }else if(mode == 'view'){
-                    $('#btnSaveRuncardDetails').prop('hidden', true);
-                }else{
-                    $('#btnSaveRuncardDetails').prop('hidden', false);
                 }
             }
         });
@@ -853,7 +867,7 @@ $(document).ready(function(){
                 $('#formProductionRuncard #txtPartName').val(prod_runcard_data[0].part_name);
                 $('#formProductionRuncard #txtPartCode').val(prod_runcard_data[0].part_code);
                 // $('#formProductionRuncard #txtPONumber').val(prod_runcard_data[0].po_number);
-                GetPOFromPPSDB($('#txtPONumber'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].po_number, 'edit');
+                GetPOFromPPSDB($('#txtPONumber'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].po_number);
                 GetMachineNo($('.SelMachineNo'), $('#txtSelectDeviceName').val(), prod_runcard_data[0].machine_no);
 
                 $('#formProductionRuncard #txtPOQty').val(prod_runcard_data[0].po_quantity);
