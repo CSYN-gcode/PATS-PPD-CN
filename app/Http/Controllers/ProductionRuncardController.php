@@ -55,233 +55,205 @@ class ProductionRuncardController extends Controller
                         INNER JOIN material_process_machines AS mat_proc_machines  ON mat_process.id = mat_proc_machines.mat_proc_id
                         WHERE devices.name = '$request->device_name'
             ");
-        // return $test;
         return response()->json(['machine_data' => $test]);
     }
 
     public function viewProdRuncard(Request $request){
-            $ProdRuncardData = DB::table('production_runcards AS runcard')
-                                    // ->select('runcard.*', DB::raw("CONCAT(users.firstname, ' ', users.lastname) AS operator_name"))
-                                    ->select('*')
-                                    // ->join('production_runcard_stations AS stations', 'runcard.id', '=', 'stations.prod_runcards_id')
-                                    // ->join('users', 'stations.last_updated_by', '=', 'users.id')
-                                    // ->when($request->device_name, function ($query) use ($request){
-                                    //     return $query ->where('runcard.part_name', $request->device_name)
-                                    //                   ->whereNull('runcard.deleted_at');
-                                    // })
-                                    ->where('runcard.part_name', $request->device_name)
-                                    ->whereNull('runcard.deleted_at')
-                                    ->get();
+        $ProdRuncardData = DB::table('production_runcards AS runcard')
+                                ->select('*')
+                                ->where('runcard.part_name', $request->device_name)
+                                ->whereNull('runcard.deleted_at')
+                                ->get();
 
-            // $ProdRuncardData = DB::connection('mysql')->select("SELECT a.* FROM production_runcards AS a
-            //                                 WHERE a.device_name = '$request->device_name'
-            //                                 ORDER BY a.id DESC
-            // ");
+        return DataTables::of($ProdRuncardData)
+        ->addColumn('action', function($row){
+            $result = '';
+            $result .= "<center>";
 
-            // $flattened_array = [];
-            // $test = DB::table('production_runcard_stations AS stations')
-            //         ->select(DB::raw("CONCAT(users.firstname, ' ', users.lastname) AS operator_name"))
-            //         ->join('users', 'stations.last_updated_by', '=', 'users.id')
-            //         ->where('stations.prod_runcards_id', $ProdRuncardData[0]->id)
-            //         ->whereNull('stations.deleted_at')
-            //         ->get()->pluck('operator_name');
-
-            //         foreach ($test as $items) {
-            //             array_push($flattened_array, $items);
-            //         }
-            //         $flattened_array = array_unique($flattened_array);
-            //         $test1 = implode(',', $flattened_array);
-            //         return $test1;
-                    // return $test1;
-                    // return $test;
-            // $flattened = $test->flatten(0);
-            // return $flattened->all();
-            // $test2 = $test->map(fn ($json) => json_decode($json))
-            //               ->flatten()
-            //               ->unique();
-            // return $test2;
-
-            // $test1 = implode(',',(array) $test);
-            // $test2 = implode(',', $test->operator_name);
-            // foreach ($test as $key => $value) {
-            //     $value
-            // }
-            // foreach($device_details as $material_details){
-            //     $arr_material_codes[] = $material_details->material_code;
-            //     $arr_material_types[] = $material_details->material_type;
-            // }
-            // return $ProdRuncardData;
-
-            return DataTables::of($ProdRuncardData)
-            ->addColumn('action', function($row){
-                $result = '';
-                $result .= "<center>";
-
-                if($row->status == 0 || $row->status == 1 || $row->status == 3){
-                    if($row->status == 0){//Pending
-                        $btn_class = 'btn btn-primary';
-                    }else if($row->status == 1){//Submitted
-                        $btn_class = 'btn btn-primary';
-                    }else if($row->status == 3){//Done
-                        $btn_class = 'btn btn-success';
-                    }
-
-                    // $cavity_details = DB::table('production_runcard_cavities')
-                    //                     ->where('prod_runcards_id', $row->id)
-                    //                     ->whereNull('deleted_at')
-                    //                     ->get();
-
-                    // if($cavity_details->isNotEmpty()){
-                    //     $is_disabled = '';
-                    // }else{
-                    //     $is_disabled = 'disabled';
-                    // }
-                        // $is_disabled
-                    $result .= "<button class='".$btn_class." btn-sm mr-1' prod_runcard-id='".$row->id."' id='btnPrintProdRuncard' >
-                                    <i class='fa-solid fa-print' disabled></i>
-                                </button>";
+            if($row->status == 0 || $row->status == 1 || $row->status == 3){
+                if($row->status == 0){//Pending
+                    $btn_class = 'btn btn-primary';
+                }else if($row->status == 1){//Submitted
+                    $btn_class = 'btn btn-primary';
+                }else if($row->status == 3){//Done
+                    $btn_class = 'btn btn-success';
                 }
 
-                if($row->status == 0 || $row->status == 1){
-                    $result .= "<button class='btn btn-primary btn-sm mr-1 btnUpdateProdRuncardData' prod_runcard-id='$row->id'>
-                                    <i class='fa-solid fa-pen-to-square'></i>
-                                </button>";
+                $result .= "<button class='".$btn_class." btn-sm mr-1' prod_runcard-id='".$row->id."' id='btnPrintProdRuncard' >
+                                <i class='fa-solid fa-print' disabled></i>
+                            </button>";
+            }
+
+            if($row->status == 0 || $row->status == 1){
+                $result .= "<button class='btn btn-primary btn-sm mr-1 btnUpdateProdRuncardData' prod_runcard-id='$row->id'>
+                                <i class='fa-solid fa-pen-to-square'></i>
+                            </button>";
+            }
+
+            if($row->status == 2 || $row->status == 3){
+                $result .= "<button class='btn btn-info btn-sm mr-1 btnViewProdRuncardData' prod_runcard-id='$row->id'>
+                                <i class='fa-solid fa-eye' title='View IPQC Inspection'></i>
+                            </button>";
+            }
+
+            if($row->status == 1){
+                $result .= "<button class='btn btn-success btn-sm mr-1' prod_runcard-id='".$row->id."' prod_runcard-status='".$row->status."' id='btnSubmitRuncardData'>
+                                <i class='fa-solid fa-circle-check'></i>
+                            </button>";
+            }
+
+            $result .= "</center>";
+            return $result;
+        })
+        ->addColumn('status', function ($row){
+            $result = "";
+
+            switch($row->status){
+                case 0: //Pending
+                    $result .= '<center><span class="badge badge-pill badge-info">For Station Process</span></center>';
+                    break;
+                case 1: //Mass Prod
+                    $result .= '<center><span class="badge badge-pill badge-primary">Mass Production</span></center>';
+                    break;
+                case 2: //Resetup
+                    $result .= '<center><span class="badge badge-pill badge-warning">For Re-setup</span></center>';
+                    break;
+                case 3: //Done
+                    $result .= '<center><span class="badge badge-pill badge-success">Done</span></center>';
+                    break;
+            }
+            return $result;
+        })
+        ->addColumn('operator_names', function ($row){
+            $op_names_array = [];
+            $operator_name_per_runcard = DB::table('production_runcard_stations AS stations')
+                ->select(DB::raw("CONCAT(users.firstname, ' ', users.lastname) AS operator_name"))
+                ->join('users', 'stations.operator_name', '=', 'users.id')
+                ->where('stations.prod_runcards_id', $row->id)
+                ->whereNull('stations.deleted_at')
+                ->get()->pluck('operator_name');
+
+                foreach ($operator_name_per_runcard as $items) {
+                    array_push($op_names_array, $items);
                 }
-
-                if($row->status == 2 || $row->status == 3){
-                    $result .= "<button class='btn btn-info btn-sm mr-1 btnViewProdRuncardData' prod_runcard-id='$row->id'>
-                                    <i class='fa-solid fa-eye' title='View IPQC Inspection'></i>
-                                </button>";
-                }
-
-                if($row->status == 1){
-                    $result .= "<button class='btn btn-success btn-sm mr-1' prod_runcard-id='".$row->id."' prod_runcard-status='".$row->status."' id='btnSubmitRuncardData'>
-                                    <i class='fa-solid fa-circle-check'></i>
-                                </button>";
-                }
-
-                $result .= "</center>";
-                return $result;
-            })
-            ->addColumn('status', function ($row){
-                $result = "";
-
-                switch($row->status){
-                    case 0: //Pending
-                        $result .= '<center><span class="badge badge-pill badge-info">For Station Process</span></center>';
-                        break;
-                    case 1: //Mass Prod
-                        $result .= '<center><span class="badge badge-pill badge-primary">Mass Production</span></center>';
-                        break;
-                    case 2: //Resetup
-                        $result .= '<center><span class="badge badge-pill badge-warning">For Re-setup</span></center>';
-                        break;
-                    case 3: //Done
-                        $result .= '<center><span class="badge badge-pill badge-success">Done</span></center>';
-                        break;
-                }
-                return $result;
-            })
-            ->addColumn('operator_names', function ($row){
-                $op_names_array = [];
-                $operator_name_per_runcard = DB::table('production_runcard_stations AS stations')
-                    ->select(DB::raw("CONCAT(users.firstname, ' ', users.lastname) AS operator_name"))
-                    ->join('users', 'stations.operator_name', '=', 'users.id')
-                    ->where('stations.prod_runcards_id', $row->id)
-                    ->whereNull('stations.deleted_at')
-                    ->get()->pluck('operator_name');
-
-                    foreach ($operator_name_per_runcard as $items) {
-                        array_push($op_names_array, $items);
-                    }
-                    $unique_op_names = array_unique($op_names_array);
-                    $all_operator_names = implode(', ', $unique_op_names);
-                return $all_operator_names;
-            })
-            ->rawColumns(['action','status','operator_names'])
-            ->make(true);
-        // }
+                $unique_op_names = array_unique($op_names_array);
+                $all_operator_names = implode(', ', $unique_op_names);
+            return $all_operator_names;
+        })
+        ->rawColumns(['action','status','operator_names'])
+        ->make(true);
     }
 
     public function viewProdRuncardStations(Request $request){
-        // if(!isset($request->assy_runcard_id)){
-        //     return [];
-        // }else{
-            $AssemblyRuncardStationData = DB::connection('mysql')->select("SELECT runcard_station.*, user.firstname, user.lastname, stations.station_name FROM production_runcard_stations AS runcard_station
-                        -- INNER JOIN devices ON runcard.part_name = devices.name AND devices.status = 1
-                        -- INNER JOIN material_processes AS process ON devices.id = process.device_id AND process.status = 0
-                        INNER JOIN stations ON runcard_station.station = stations.id
-                        INNER JOIN users AS user ON runcard_station.operator_name = user.id
-                        WHERE runcard_station.prod_runcards_id = '$request->prod_runcard_id'
-                        AND runcard_station.deleted_at IS NULL
-                        ORDER BY runcard_station.id ASC
-            ");
-            // return $AssemblyRuncardStationData;
+        $AssemblyRuncardStationData = DB::connection('mysql')->select("SELECT runcard_station.*, user.firstname, user.lastname, stations.station_name FROM production_runcard_stations AS runcard_station
+                    -- INNER JOIN devices ON runcard.part_name = devices.name AND devices.status = 1
+                    -- INNER JOIN material_processes AS process ON devices.id = process.device_id AND process.status = 0
+                    INNER JOIN stations ON runcard_station.station = stations.id
+                    INNER JOIN users AS user ON runcard_station.operator_name = user.id
+                    WHERE runcard_station.prod_runcards_id = '$request->prod_runcard_id'
+                    AND runcard_station.deleted_at IS NULL
+                    ORDER BY runcard_station.id ASC
+        ");
 
-            return DataTables::of($AssemblyRuncardStationData)
-            ->addColumn('action', function($station) use ($request){
-                $result = '';
+        return DataTables::of($AssemblyRuncardStationData)
+        ->addColumn('action', function($station) use ($request){
+            $result = '';
 
-                if($station->status == 0 || $station->status == 1){
-                    $result .= "<center>
-                                    <button class='btn btn-primary btn-sm mr-1 btnUpdateProdRuncardStationData' prod_runcard-id='$request->prod_runcard_id' prod_runcard_stations-id='$station->id'><i class='fa-solid fa-pen-to-square'></i></button>
-                                </center>";
-                }
-
-                if($station->status == 2 || $station->status == 3){
+            if($station->status == 0 || $station->status == 1){
                 $result .= "<center>
-                                <button class='btn btn-primary btn-sm mr-1 btnViewProdRuncardStationData' prod_runcard-id='$request->prod_runcard_id' prod_runcard_stations-id='$station->id'><i class='fa-solid fa-eye'></i></button>
+                                <button class='btn btn-primary btn-sm mr-1 btnUpdateProdRuncardStationData' prod_runcard-id='$request->prod_runcard_id' prod_runcard_stations-id='$station->id'><i class='fa-solid fa-pen-to-square'></i></button>
                             </center>";
-                }
+            }
 
-                return $result;
-            })
-            ->addColumn('status', function($station){
-                $result = '';
-                if($station->status == 0 || $station->status == 1 || $station->status == 2){
-                    $result .= "<center>
-                                    <span class='badge rounded-pill bg-info'>On-going</span>
-                                </center>";
-                }
+            if($station->status == 2 || $station->status == 3){
+            $result .= "<center>
+                            <button class='btn btn-primary btn-sm mr-1 btnViewProdRuncardStationData' prod_runcard-id='$request->prod_runcard_id' prod_runcard_stations-id='$station->id'><i class='fa-solid fa-eye'></i></button>
+                        </center>";
+            }
 
-                if($station->status == 3){
-                    $result .= "<center>
-                                    <span class='badge rounded-pill bg-info'>Done</span>
-                                </center>";
-                }
-                return $result;
-            })
-            ->addColumn('operator', function($station){
-                $result = '';
-                $result .= $station->firstname.' '.$station->lastname;
-                return $result;
-            })
-            ->rawColumns(['action','status','runcard_no','operator'])
-            ->make(true);
+            return $result;
+        })
+        ->addColumn('status', function($station){
+            $result = '';
+            if($station->status == 0 || $station->status == 1 || $station->status == 2){
+                $result .= "<center>
+                                <span class='badge rounded-pill bg-info'>On-going</span>
+                            </center>";
+            }
+
+            if($station->status == 3){
+                $result .= "<center>
+                                <span class='badge rounded-pill bg-info'>Done</span>
+                            </center>";
+            }
+            return $result;
+        })
+        ->addColumn('operator', function($station){
+            $result = '';
+            $result .= $station->firstname.' '.$station->lastname;
+            return $result;
+        })
+        ->rawColumns(['action','status','runcard_no','operator'])
+        ->make(true);
     }
 
+    // public function GetPOFromPPSDB(Request $request){
+    //     if(isset($request->po_number)){
+    //         $andWhere = '';
+    //     }else{
+    //         $andWhere = 'AND po_receive.POBalance > 0';
+    //     }
+
+    //     $po_details = DB::connection('mysql_rapid_pps')->select(' SELECT po_receive.ItemName AS part_name, po_receive.OrderNo AS po_number, po_receive.POBalance AS po_quantity, po_receive.DateIssued AS received_date
+    //                         FROM tbl_POReceived AS po_receive
+    //                         WHERE po_receive.ItemName = "'.$request->device_name.'"'.$andWhere.' ORDER BY po_receive.DateIssued ASC;
+    //     ');
+
+    //     return response()->json(['result' => 1, 'po_details' => $po_details]);
+    // }
+
     public function GetPOFromPPSDB(Request $request){
-        if(isset($request->po_number)){
-            $andWhere = '';
-        }else{
+        //old code for reference
+        // if(isset($request->po_number)){
+        //     $andWhere = '';
+        // }else{
+        //     $andWhere = 'AND po_receive.POBalance > 0';
+        // }
+        if (isset($request->po_number)) {
+            $andWhere = 'AND (po_receive.POBalance > 0 OR po_receive.OrderNo = "'.$request->po_number.'")';
+        } else {
             $andWhere = 'AND po_receive.POBalance > 0';
         }
 
-        $po_details = DB::connection('mysql_rapid_pps')->select(' SELECT po_receive.ItemName AS part_name, po_receive.OrderNo AS po_number, po_receive.POBalance AS po_quantity, po_receive.DateIssued AS received_date
+        $po_details = DB::connection('mysql_rapid_pps')->select(' SELECT po_receive.OrderNo AS po_number, po_receive.OrderQty AS order_quantity, po_receive.POBalance AS po_quantity, po_receive.DateIssued AS received_date
                             FROM tbl_POReceived AS po_receive
                             WHERE po_receive.ItemName = "'.$request->device_name.'"'.$andWhere.' ORDER BY po_receive.DateIssued ASC;
         ');
 
-        return response()->json(['result' => 1, 'po_details' => $po_details]);
+        for($i = 0; $i < count($po_details); $i++){
+            $po_output = DB::table('production_runcards AS runcard')
+                        ->select(DB::raw('SUM(runcard.shipment_output) as accume_ttl_output'))
+                        ->where('runcard.po_number', $po_details[$i]->po_number)
+                        ->whereNull('runcard.deleted_at')
+                        ->first();
+
+            if($po_output->accume_ttl_output < $po_details[$i]->order_quantity){
+                $oldest_po_pats = $po_details[$i]->po_number;
+                $oldest_po_index = $i;
+                break; // 🔥 stops the loop immediately
+            }
+        }
+
+        return response()->json(['result' => 1, 'po_details' => $po_details, 'oldest_po_pats' => $oldest_po_pats, 'oldest_po_index' => $oldest_po_index]);
     }
 
     public function searchPoFromPpsDb(Request $request){
         $po_details = DB::connection('mysql_rapid_pps')
-        ->select(' SELECT po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS order_quantity, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev, dieset.DieNo AS die_no
-            FROM tbl_POReceived AS po_receive
-            LEFT JOIN tbl_dieset AS dieset ON po_receive.ItemCode = dieset.R3Code
-            WHERE po_receive.OrderNo = "'.$request->po_number.'" AND po_receive.ItemName = "'.$request->device_name.'"
-            ');
+                        ->select(' SELECT po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS order_quantity, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev, dieset.DieNo AS die_no
+                            FROM tbl_POReceived AS po_receive
+                            LEFT JOIN tbl_dieset AS dieset ON po_receive.ItemCode = dieset.R3Code
+                            WHERE po_receive.OrderNo = "'.$request->po_number.'" AND po_receive.ItemName = "'.$request->device_name.'"
+                        ');
 
         $po_tll_output = DB::table('production_runcards AS runcard')
                         ->select(DB::raw('SUM(runcard.shipment_output) as accume_ttl_output'))
@@ -318,27 +290,58 @@ class ProductionRuncardController extends Controller
                     $acdcs_data = $acdcs_data[0];
                 }
             }
-
-            // $test = $exploded_device_name[1].'-'.$exploded_device_name[2]; // CLARK 09182024
-            // $test = $exploded_device_name[0];
-            // $test = $exploded_device_name[2];
-
-            // -- WHERE `doc_type` = '".$request->doc_type."' AND `doc_title` LIKE '%".$exploded_device_name[0]."%'");
-            // -- // -- WHERE `doc_title` LIKE '%".$test."%'");
-
-            // $result = 0;
-            // if(empty($acdcs_data)){
-            //     $result = 2;
-            //     $po_details = $po_details[0];
-            //     $acdcs_data = '';
-            // }else{
-            //     $po_details = $po_details[0];
-            //     $acdcs_data = $acdcs_data[0];
-            // }
         }
 
         return response()->json(['result' => $result, 'acdcs_data' => $acdcs_data, 'po_balance' => $po_balance, 'po_details' => $po_details]);
     }
+
+    // public function searchPoFromPpsDb(Request $request){
+    //     $po_details = DB::connection('mysql_rapid_pps')
+    //     ->select(' SELECT po_receive.ItemName AS part_name, po_receive.ItemCode AS part_code, po_receive.OrderNo AS po_number, po_receive.OrderQty AS order_quantity, dieset.DrawingNo AS drawing_no, dieset.Rev AS drawing_rev, dieset.DieNo AS die_no
+    //         FROM tbl_POReceived AS po_receive
+    //         LEFT JOIN tbl_dieset AS dieset ON po_receive.ItemCode = dieset.R3Code
+    //         WHERE po_receive.OrderNo = "'.$request->po_number.'" AND po_receive.ItemName = "'.$request->device_name.'"
+    //         ');
+
+    //     $po_tll_output = DB::table('production_runcards AS runcard')
+    //                     ->select(DB::raw('SUM(runcard.shipment_output) as accume_ttl_output'))
+    //                     ->where('runcard.po_number', $request->po_number)
+    //                     ->whereNull('runcard.deleted_at')
+    //                     ->first();
+
+    //     $po_balance = $po_details[0]->order_quantity - $po_tll_output->accume_ttl_output;
+
+    //     if($po_balance < 0){
+    //         $po_balance = 0;
+    //     }
+
+    //     if(empty($po_details)){
+    //         $result = 0;
+    //         $po_details = '';
+    //         $acdcs_data = '';
+    //     }else{
+    //         $result = 1;
+    //         $po_details = $po_details[0];
+    //         $acdcs_data = '';
+
+    //         if($po_details->drawing_no == '' || $po_details->drawing_rev == ''){
+    //             $exploded_device_name = explode("-",$po_details->part_name);
+    //             $concatted_device_name = $exploded_device_name[0].'-'.$exploded_device_name[1]; // CLARK 09182024
+
+    //             $acdcs_data = DB::connection('mysql_rapid_acdcs')
+    //                     ->select("SELECT DISTINCT `doc_no`,`doc_type`,`rev_no` FROM tbl_active_docs
+    //                     WHERE `doc_type` = '".$request->doc_type."' AND `doc_title` LIKE '%".$concatted_device_name."%' ORDER BY `rev_no` DESC"
+    //             );
+
+    //             if(!empty($acdcs_data)){
+    //                 $result = 2;
+    //                 $acdcs_data = $acdcs_data[0];
+    //             }
+    //         }
+    //     }
+
+    //     return response()->json(['result' => $result, 'acdcs_data' => $acdcs_data, 'po_balance' => $po_balance, 'po_details' => $po_details]);
+    // }
 
     public function ValidateMatLotNumber(Request $request){
         $whs_material_name = DB::connection('mysql_rapid_pps')
