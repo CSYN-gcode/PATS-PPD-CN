@@ -243,15 +243,7 @@ $(document).ready(function(){
                         result = '<option value="" disabled selected> Select PO No. (Oldest - Newest) </option>';
                     for (let index = 0; index < po_details.length; index++) {
                         if(po_details[index]['po_number'] == PoNumber || po_details[index]['po_quantity'] > 0){
-                            if(index <= oldest_po_index || oldest_po_pats == po_details[index]['po_number']){
-                                isDisabled = '';
-                            }else if(PoNumber == po_details[index]['po_number']){
-                                isDisabled = '';
-                            }else{
-                                // isDisabled = 'disabled'; //clark comment 04/01/2026 until PO received is updated
-                                isDisabled = '';
-                            }
-                            result += '<option '+isDisabled+' value="' + po_details[index]['po_number'] + '">' + po_details[index]['po_number'] + '</option>';
+                            result += '<option value="' + po_details[index]['po_number'] + '">' + po_details[index]['po_number'] + '</option>';
                         }
                     }
                 }else{
