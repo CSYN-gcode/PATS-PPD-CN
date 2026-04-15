@@ -156,6 +156,7 @@
                                     <option value="1">Normal</option>
                                     <option value="2">Tightened</option>
                                     <option value="3">Label Check</option>
+                                    <option value="4">Reduced</option>
                                 </select>
                             </div>
                             <div class="input-group input-group-sm mb-3">
